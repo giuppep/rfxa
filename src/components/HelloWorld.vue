@@ -5,8 +5,6 @@ import { cumulativeLast12Months } from "@/utils/finance"
 import { parseBacenJson } from "@/utils/bacen"
 // import { parseIpeaJson } from "@/utils/ipea"
 
-defineProps<{ msg: string }>()
-
 const CDI = ref<IndexValue[]>([])
 const thisYearCDI = computed(() => {
     const thisYear = 2023
@@ -33,8 +31,6 @@ onMounted(async () => {
 </script>
 
 <template>
-    <h1>{{ msg }}</h1>
-
     <div>
         <table>
             <thead>
