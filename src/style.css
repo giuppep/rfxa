@@ -11,4 +11,21 @@
     h1 {
         @apply text-5xl font-black;
     }
+
+    table {
+        @apply bg-white;
+    }
+
+    table > thead > th {
+        @apply font-medium text-left;
+        @apply px-3 py-2;
+    }
+
+    table > tbody > tr {
+        @apply odd:bg-slate-200;
+    }
+
+    td {
+        @apply px-3 py-2;
+    }
 }
