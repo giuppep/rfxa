@@ -40,11 +40,19 @@ onMounted(async () => {
             </thead>
             <tbody>
                 <tr v-for="(entry, idx) in thisYearCDI">
-                    <td>
-                        {{ Intl.DateTimeFormat("en-GB").format(entry.date) }}
+                    <td class="capitalize">
+                        {{
+                            Intl.DateTimeFormat("en-GB", {
+                                month: "long",
+                            }).format(entry.date)
+                        }}
                     </td>
-                    <td>{{ (100 * entry.value).toFixed(2) }}%</td>
-                    <td>{{ (100 * cumulative[idx]).toFixed(2) }}%</td>
+                    <td class="slashed-zero">
+                        {{ (100 * entry.value).toFixed(2) }}%
+                    </td>
+                    <td class="slashed-zero">
+                        {{ (100 * cumulative[idx]).toFixed(2) }}%
+                    </td>
                 </tr>
             </tbody>
         </table>
