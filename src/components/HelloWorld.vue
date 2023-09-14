@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watchEffect } from "vue"
+import { ref, onMounted, computed } from "vue"
 import { IndexValue } from "@/models/finance"
-import { cumulativeLast12Months } from "@/utils/finance"
 import { parseBacenJson } from "@/utils/bacen"
 import IndexLineChart from "./IndexLineChart.vue"
+import IndexTable from "./IndexTable.vue"
 // import { parseIpeaJson } from "@/utils/ipea"
 
 const CDI = ref<IndexValue[]>([])
@@ -13,7 +13,6 @@ const thisYearCDI = computed(() => {
         (indexValue) => indexValue.date.getFullYear() >= thisYear
     )
 })
-let cumulative: number[] = []
 onMounted(async () => {
     // Use local file for development
     // const url =
@@ -26,37 +25,12 @@ onMounted(async () => {
     const response = await fetch(url)
     CDI.value = parseBacenJson(await response.json())
     // CDI.value = parseIpeaJson((await response.json()).value)
-
-    cumulative = cumulativeLast12Months(CDI.value)
 })
 </script>
 
 <template>
     <div class="flex">
-        <table>
-            <thead>
-                <th>Date</th>
-                <th>Value</th>
-                <th>Last 12 mths</th>
-            </thead>
-            <tbody>
-                <tr v-for="(entry, idx) in thisYearCDI">
-                    <td class="capitalize">
-                        {{
-                            Intl.DateTimeFormat("en-GB", {
-                                month: "long",
-                            }).format(entry.date)
-                        }}
-                    </td>
-                    <td class="slashed-zero">
-                        {{ (100 * entry.value).toFixed(2) }}%
-                    </td>
-                    <td class="slashed-zero">
-                        {{ (100 * cumulative[idx]).toFixed(2) }}%
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <IndexTable :index-values="thisYearCDI" />
         <IndexLineChart :index-values="thisYearCDI" />
     </div>
 </template>
