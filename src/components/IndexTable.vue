@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { IndexValue } from "@/models/finance"
+import { CumulativeIndexValue } from "@/models/finance"
 
-defineProps<{ indexValues: IndexValue[] }>()
+defineProps<{ monthlyIndexValues: CumulativeIndexValue[] }>()
 </script>
 
 <template>
@@ -9,9 +9,11 @@ defineProps<{ indexValues: IndexValue[] }>()
         <thead>
             <th>Date</th>
             <th>Value</th>
+            <th>YoY</th>
+            <th>YTD</th>
         </thead>
         <tbody>
-            <tr v-for="entry in indexValues">
+            <tr v-for="entry in monthlyIndexValues">
                 <td class="capitalize">
                     {{
                         Intl.DateTimeFormat("en-GB", {
@@ -21,6 +23,12 @@ defineProps<{ indexValues: IndexValue[] }>()
                 </td>
                 <td class="slashed-zero">
                     {{ (100 * entry.value).toFixed(2) }}%
+                </td>
+                <td class="slashed-zero">
+                    {{ (100 * entry.cumulativeLast12Monhts).toFixed(2) }}%
+                </td>
+                <td class="slashed-zero">
+                    {{ (100 * entry.cumulativeSinceYearStart).toFixed(2) }}%
                 </td>
             </tr>
         </tbody>
