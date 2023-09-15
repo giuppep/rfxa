@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue"
-import { IndexValue } from "@/models/finance"
+import { IndexValue, CumulativeIndexValue } from "@/models/finance"
 import { parseBacenJson } from "@/utils/bacen"
 import IndexLineChart from "./IndexLineChart.vue"
 import IndexTable from "./IndexTable.vue"
+import { computeCumulativeIndexValues } from "@/utils/finance"
 // import { parseIpeaJson } from "@/utils/ipea"
 
 const CDI = ref<IndexValue[]>([])
+const CDIMonthly = ref<CumulativeIndexValue[]>([])
 const thisYearCDI = computed(() => {
     const thisYear = 2023
-    return CDI.value.filter(
-        (indexValue) => indexValue.date.getFullYear() >= thisYear
+    return CDIMonthly.value.filter(
+        (indexValue) => indexValue.date.getFullYear() === thisYear
     )
 })
 onMounted(async () => {
@@ -24,13 +26,14 @@ onMounted(async () => {
 
     const response = await fetch(url)
     CDI.value = parseBacenJson(await response.json())
+    CDIMonthly.value = computeCumulativeIndexValues(CDI.value)
     // CDI.value = parseIpeaJson((await response.json()).value)
 })
 </script>
 
 <template>
     <div class="flex">
-        <IndexTable :index-values="thisYearCDI" />
+        <IndexTable :monthly-index-values="thisYearCDI" />
         <IndexLineChart :index-values="thisYearCDI" />
     </div>
 </template>

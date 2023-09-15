@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { IndexValue } from "@/models/finance"
+import { IndexValue, CumulativeIndexValue } from "@/models/finance"
 import * as d3 from "d3"
 import { ref, watchEffect } from "vue"
 
-defineProps<{ indexValues: IndexValue[] }>()
+defineProps<{ indexValues: IndexValue[] | CumulativeIndexValue[] }>()
 
-const width = 640
+const width = 680
 const height = 400
 const marginTop = 20
 const marginRight = 20
@@ -15,6 +15,7 @@ const marginLeft = 40
 // Declare the x (horizontal position) scale.
 const x = d3
     .scaleUtc()
+    // TODO: this should be dynamic
     .domain([new Date("2023-01-01"), new Date("2024-01-01")])
     .range([marginLeft, width - marginRight])
 
