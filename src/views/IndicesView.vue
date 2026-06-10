@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, watchEffect, computed } from "vue"
+import { ref, watchEffect } from "vue"
 import { IndexValue, CumulativeIndexValue } from "@/models/finance"
-import { parseBacenJson } from "@/utils/bacen"
+import { bacenRequest } from "@/utils/bacen"
 import IndexLineChart from "@/components/IndexLineChart.vue"
 import IndexTable from "@/components/IndexTable.vue"
 import { computeCumulativeIndexValues } from "@/utils/finance"
@@ -11,19 +11,17 @@ const props = defineProps<{ type: IndexId }>()
 
 const indexValues = ref<IndexValue[]>([])
 const monthlyIndexValues = ref<CumulativeIndexValue[]>([])
-const thisYearIndexValues = computed(() => {
-    const thisYear = 2023
-    return monthlyIndexValues.value.filter(
-        (indexValue) => indexValue.date.getFullYear() === thisYear
-    )
-})
 
 watchEffect(async () => {
     const index = ECONOMIC_INDICES.find((index) => index.id === props.type)
     if (!index) return
 
-    const response = await fetch(index.url)
-    indexValues.value = parseBacenJson(await response.json())
+    const periodEnd = new Date()
+    const periodStart = new Date(periodEnd)
+    periodStart.setMonth(periodStart.getMonth() - 12)
+    periodStart.setDate(1)
+
+    indexValues.value = await bacenRequest(index.url, periodStart, periodEnd)
     monthlyIndexValues.value = computeCumulativeIndexValues(indexValues.value)
 })
 </script>
@@ -39,7 +37,7 @@ watchEffect(async () => {
         </RouterLink>
     </nav>
     <div class="flex">
-        <IndexTable :monthly-index-values="thisYearIndexValues" />
-        <IndexLineChart :index-values="thisYearIndexValues" />
+        <IndexTable :monthly-index-values="monthlyIndexValues" />
+        <IndexLineChart :index-values="monthlyIndexValues" />
     </div>
 </template>

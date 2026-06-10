@@ -11,7 +11,7 @@ export const ECONOMIC_INDICES: IndexConfig[] = [
     {
         id: "selic",
         label: "SELIC",
-        url: "https://api.bcb.gov.br/dados/serie/bcdata.sgs.11/dados?formato=json",
+        url: "https://api.bcb.gov.br/dados/serie/bcdata.sgs.4390/dados?formato=json",
     },
     {
         id: "ipca",
