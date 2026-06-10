@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { IndexValue, CumulativeIndexValue } from "@/models/finance"
 import * as d3 from "d3"
-import { ref, watchEffect } from "vue"
+import { ref, computed, watchEffect } from "vue"
 
-defineProps<{ indexValues: IndexValue[] | CumulativeIndexValue[] }>()
+const props = defineProps<{
+    indexValues: IndexValue[] | CumulativeIndexValue[]
+    periodStart: Date
+    periodEnd: Date
+}>()
 
 const width = 680
 const height = 400
@@ -13,11 +17,12 @@ const marginBottom = 30
 const marginLeft = 40
 
 // Declare the x (horizontal position) scale.
-const x = d3
-    .scaleUtc()
-    // TODO: this should be dynamic
-    .domain([new Date("2023-01-01"), new Date("2024-01-01")])
-    .range([marginLeft, width - marginRight])
+const x = computed(() =>
+    d3
+        .scaleUtc()
+        .domain([props.periodStart, props.periodEnd])
+        .range([marginLeft, width - marginRight])
+)
 
 // Declare the y (vertical position) scale.
 const y = d3
@@ -28,14 +33,14 @@ const y = d3
 
 const line = d3
     .line<IndexValue>()
-    .x((d) => x(d.date))
+    .x((d) => x.value(d.date))
     .y((d) => y(d.value))
 
 const gy = ref<SVGGElement | null>(null)
 const gx = ref<SVGGElement | null>(null)
 
 watchEffect(() => {
-    if (gx.value) d3.select(gx.value).call(d3.axisBottom(x))
+    if (gx.value) d3.select(gx.value).call(d3.axisBottom(x.value))
     if (gy.value)
         d3.select(gy.value).call(d3.axisLeft(y).tickFormat(d3.format(".1%")))
 })
