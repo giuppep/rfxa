@@ -7,7 +7,11 @@ interface IndexConfig {
 }
 
 export const ECONOMIC_INDICES: IndexConfig[] = [
-    { id: "cdi", label: "CDI", url: "/cdi.json" },
+    {
+        id: "cdi",
+        label: "CDI",
+        url: "https://api.bcb.gov.br/dados/serie/bcdata.sgs.4391/dados?formato=json",
+    },
     {
         id: "selic",
         label: "SELIC",
