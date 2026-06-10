@@ -11,17 +11,24 @@ const props = defineProps<{ type: IndexId }>()
 
 const indexValues = ref<IndexValue[]>([])
 const monthlyIndexValues = ref<CumulativeIndexValue[]>([])
+const periodStart = ref(new Date())
+const periodEnd = ref(new Date())
 
 watchEffect(async () => {
     const index = ECONOMIC_INDICES.find((index) => index.id === props.type)
     if (!index) return
 
-    const periodEnd = new Date()
-    const periodStart = new Date(periodEnd)
-    periodStart.setMonth(periodStart.getMonth() - 12)
-    periodStart.setDate(1)
+    periodEnd.value = new Date()
+    periodStart.value = new Date(periodEnd.value)
+    periodStart.value.setMonth(periodStart.value.getMonth() - 12)
+    periodStart.value.setDate(1)
 
-    indexValues.value = await bacenRequest(index.url, periodStart, periodEnd)
+    console.log("Request", index, periodStart.value, periodEnd.value)
+    indexValues.value = await bacenRequest(
+        index.url,
+        periodStart.value,
+        periodEnd.value
+    )
     monthlyIndexValues.value = computeCumulativeIndexValues(indexValues.value)
 })
 </script>
@@ -38,6 +45,10 @@ watchEffect(async () => {
     </nav>
     <div class="flex">
         <IndexTable :monthly-index-values="monthlyIndexValues" />
-        <IndexLineChart :index-values="monthlyIndexValues" />
+        <IndexLineChart
+            :index-values="monthlyIndexValues"
+            :period-start="periodStart"
+            :period-end="periodEnd"
+        />
     </div>
 </template>
