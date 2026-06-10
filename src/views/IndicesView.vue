@@ -2,8 +2,8 @@
 import { ref, onMounted, computed } from "vue"
 import { IndexValue, CumulativeIndexValue } from "@/models/finance"
 import { parseBacenJson } from "@/utils/bacen"
-import IndexLineChart from "./IndexLineChart.vue"
-import IndexTable from "./IndexTable.vue"
+import IndexLineChart from "@/components/IndexLineChart.vue"
+import IndexTable from "@/components/IndexTable.vue"
 import { computeCumulativeIndexValues } from "@/utils/finance"
 // import { parseIpeaJson } from "@/utils/ipea"
 
@@ -37,5 +37,3 @@ onMounted(async () => {
         <IndexLineChart :index-values="thisYearCDI" />
     </div>
 </template>
-
-<style scoped></style>

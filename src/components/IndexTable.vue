@@ -7,10 +7,12 @@ defineProps<{ monthlyIndexValues: CumulativeIndexValue[] }>()
 <template>
     <table>
         <thead>
-            <th>Date</th>
-            <th>Value</th>
-            <th>YoY</th>
-            <th>YTD</th>
+            <tr>
+                <th>Date</th>
+                <th>Value</th>
+                <th>YoY</th>
+                <th>YTD</th>
+            </tr>
         </thead>
         <tbody>
             <tr v-for="entry in monthlyIndexValues">

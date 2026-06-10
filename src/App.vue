@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import HelloWorld from "./components/HelloWorld.vue"
+import NavBar from "./components/NavBar.vue"
 </script>
 
 <template>
-    <h1>rfxa</h1>
-    <HelloWorld />
+    <NavBar />
+    <router-view />
 </template>
