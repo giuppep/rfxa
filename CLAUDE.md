@@ -58,8 +58,7 @@ development.
 
 - `IndexValue { date: Date; value: number }` — `value` is a fractional rate
   (e.g. `0.0146` for 1.46%).
-- `CumulativeIndexValue` extends it with `cumulativeSinceYearStart` (YTD) and
-  `cumulativeLast12Months` (YoY).
+- `CumulativeIndexValue` extends it with `cumulativeLast12Months` (YoY).
 - `computeCumulativeIndexValues` assumes its input is sorted **descending** by
   date; `cumulativeLast12Months` is computed via `arr.slice(idx, idx + 12)`,
   which relies on that ordering to get the trailing 12 months.
@@ -67,11 +66,10 @@ development.
 ### Chart (`src/components/IndexLineChart.vue`)
 
 Built with Chart.js (`vue-chartjs`) + `chartjs-adapter-date-fns` for the time
-scale. Displays **one series at a time** via the `series: "value" | "ytd" |
-"yoy"` prop (selected in `IndicesView.vue`). The x-axis range is derived from
-the actual data (`indexValues[0]`/`indexValues[last]`, since data is
-descending) rather than `periodStart`/`periodEnd`, except for `"ytd"` which
-always starts from January 1st of `periodEnd`'s year.
+scale. Displays **one series at a time** via the `series: "value" | "yoy"`
+prop (selected in `IndicesView.vue`). The x-axis range is derived from the
+actual data (`indexValues[0]`/`indexValues[last]`, since data is descending)
+rather than `periodStart`/`periodEnd`.
 
 ### Routing
 

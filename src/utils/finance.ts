@@ -18,14 +18,6 @@ export const computeCumulativeIndexValues = (indexValues: IndexValue[]) => {
         return {
             date: indexValue.date,
             value: indexValue.value,
-            cumulativeSinceYearStart: computeCumulativeInterest(
-                arr.filter(
-                    (iv) =>
-                        iv.date.getFullYear() ===
-                            indexValue.date.getFullYear() &&
-                        iv.date.getMonth() <= indexValue.date.getMonth()
-                )
-            ),
             // FIXME: assumes input sorted in descending order
             cumulativeLast12Months: computeCumulativeInterest(
                 arr.slice(idx, idx + 12)

@@ -31,8 +31,8 @@ const props = withDefaults(
         indexValues: IndexValue[] | CumulativeIndexValue[]
         periodStart: Date
         periodEnd: Date
-        /** Which value to plot. "ytd"/"yoy" require `indexValues` to be `CumulativeIndexValue[]`. */
-        series?: "value" | "ytd" | "yoy"
+        /** Which value to plot. "yoy" requires `indexValues` to be `CumulativeIndexValue[]`. */
+        series?: "value" | "yoy"
     }>(),
     { series: "value" }
 )
@@ -40,14 +40,11 @@ const props = withDefaults(
 // rgb triplets so both the line and its translucent fill can share a color.
 const SERIES_COLOR: Record<typeof props.series, string> = {
     value: "30, 41, 59", // slate-800
-    ytd: "37, 99, 235", // blue-600
     yoy: "5, 150, 105", // emerald-600
 }
 
 const seriesValue = (d: IndexValue | CumulativeIndexValue) => {
     switch (props.series) {
-        case "ytd":
-            return (d as CumulativeIndexValue).cumulativeSinceYearStart
         case "yoy":
             return (d as CumulativeIndexValue).cumulativeLast12Months
         default:
@@ -83,16 +80,11 @@ const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
 // and the first entry is the most recent. Use these as the axis bounds
 // instead of periodStart/periodEnd so we don't show ticks for months we
 // don't have data for (e.g. the current month before BACEN publishes it).
-const xMin = computed(() => {
-    // YTD always starts from the beginning of the current year, regardless
-    // of how far back the rest of the displayed data goes.
-    if (props.series === "ytd")
-        return new Date(props.periodEnd.getFullYear(), 0, 1).valueOf()
-
-    return props.indexValues.length > 0
+const xMin = computed(() =>
+    props.indexValues.length > 0
         ? props.indexValues[props.indexValues.length - 1].date.valueOf()
         : props.periodStart.valueOf()
-})
+)
 
 const xMax = computed(() =>
     props.indexValues.length > 0

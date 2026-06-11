@@ -13,10 +13,9 @@ const props = defineProps<{ type: IndexId }>()
 
 const indexValues = ref<IndexValue[]>([])
 const monthlyIndexValues = ref<CumulativeIndexValue[]>([])
-const chartSeries = ref<"value" | "ytd" | "yoy">("value")
+const chartSeries = ref<"value" | "yoy">("value")
 const SERIES_OPTIONS: { value: typeof chartSeries.value; label: string }[] = [
     { value: "value", label: "Value" },
-    { value: "ytd", label: "YTD" },
     { value: "yoy", label: "YoY" },
 ]
 
