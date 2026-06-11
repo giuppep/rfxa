@@ -2,7 +2,7 @@ export type IndexId = "cdi" | "selic" | "ipca" | "igpm"
 
 export type IndexProvider = "bacen" | "ipea"
 
-interface IndexConfig {
+export interface IndexConfig {
     id: IndexId
     label: string
     provider: IndexProvider
