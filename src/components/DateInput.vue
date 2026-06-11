@@ -22,8 +22,12 @@ const value = computed({
 </script>
 
 <template>
-    <label class="flex items-center gap-1">
-        {{ label }}
-        <input v-model="value" type="date" class="border px-2 py-1" />
+    <label class="flex flex-col items-start gap-0.5">
+        <span class="text-sm font-medium text-slate-700"> {{ label }}: </span>
+        <input
+            v-model="value"
+            type="date"
+            class="border rounded-md px-2 py-0.5"
+        />
     </label>
 </template>
