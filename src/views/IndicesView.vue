@@ -49,6 +49,8 @@ watchEffect(async () => {
             :index-values="monthlyIndexValues"
             :period-start="periodStart"
             :period-end="periodEnd"
+            show-yoy
+            show-ytd
         />
     </div>
 </template>

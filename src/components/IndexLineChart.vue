@@ -10,7 +10,9 @@ import {
     TimeScale,
     Filler,
     Tooltip,
+    Legend,
     type ChartData,
+    type ChartDataset,
     type ChartOptions,
 } from "chart.js"
 import "chartjs-adapter-date-fns"
@@ -23,19 +25,25 @@ ChartJS.register(
     LinearScale,
     TimeScale,
     Filler,
-    Tooltip
+    Tooltip,
+    Legend
 )
 
 const props = defineProps<{
     indexValues: IndexValue[] | CumulativeIndexValue[]
     periodStart: Date
     periodEnd: Date
+    /** Also plot the cumulative value since the start of the year. Requires `indexValues` to be `CumulativeIndexValue[]`. */
+    showYtd?: boolean
+    /** Also plot the cumulative value over the trailing 12 months. Requires `indexValues` to be `CumulativeIndexValue[]`. */
+    showYoy?: boolean
 }>()
 
 const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
-    () => ({
-        datasets: [
+    () => {
+        const datasets: ChartDataset<"line", { x: number; y: number }[]>[] = [
             {
+                label: "Value",
                 data: props.indexValues.map((d) => ({
                     x: d.date.valueOf(),
                     y: d.value,
@@ -49,17 +57,63 @@ const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
                 pointHoverRadius: 4,
                 pointHoverBackgroundColor: "#1e293b",
             },
-        ],
-    })
+        ]
+
+        if (props.showYtd) {
+            datasets.push({
+                label: "YTD",
+                data: (props.indexValues as CumulativeIndexValue[]).map(
+                    (d) => ({
+                        x: d.date.valueOf(),
+                        y: d.cumulativeSinceYearStart,
+                    })
+                ),
+                borderColor: "#2563eb",
+                fill: false,
+                tension: 0.1,
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                pointHoverBackgroundColor: "#2563eb",
+                yAxisID: "y1",
+            })
+        }
+
+        if (props.showYoy) {
+            datasets.push({
+                label: "YoY",
+                data: (props.indexValues as CumulativeIndexValue[]).map(
+                    (d) => ({
+                        x: d.date.valueOf(),
+                        y: d.cumulativeLast12Monhts,
+                    })
+                ),
+                borderColor: "#059669",
+                fill: false,
+                tension: 0.1,
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                pointHoverBackgroundColor: "#059669",
+                yAxisID: "y1",
+            })
+        }
+
+        return { datasets }
+    }
 )
 
 const chartOptions = computed<ChartOptions<"line">>(() => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
+        legend: {
+            display: !!(props.showYtd || props.showYoy),
+        },
         tooltip: {
             callbacks: {
-                label: (ctx) => `${(100 * (ctx.parsed.y ?? 0)).toFixed(2)}%`,
+                label: (ctx) =>
+                    `${ctx.dataset.label}: ${(100 * (ctx.parsed.y ?? 0)).toFixed(2)}%`,
             },
         },
     },
@@ -72,7 +126,17 @@ const chartOptions = computed<ChartOptions<"line">>(() => ({
             grid: { display: false },
         },
         y: {
+            position: "left",
             grid: { color: "#f1f5f9" },
+            ticks: {
+                callback: (value) => `${(100 * Number(value)).toFixed(1)}%`,
+            },
+        },
+        y1: {
+            type: "linear",
+            position: "right",
+            display: !!(props.showYtd || props.showYoy),
+            grid: { drawOnChartArea: false },
             ticks: {
                 callback: (value) => `${(100 * Number(value)).toFixed(1)}%`,
             },
