@@ -32,14 +32,14 @@ const props = withDefaults(
         periodStart: Date
         periodEnd: Date
         /** Which value to plot. "yoy" requires `indexValues` to be `CumulativeIndexValue[]`. */
-        series?: "value" | "yoy"
+        series?: "mom" | "yoy"
     }>(),
-    { series: "value" }
+    { series: "mom" }
 )
 
 // rgb triplets so both the line and its translucent fill can share a color.
 const SERIES_COLOR: Record<typeof props.series, string> = {
-    value: "30, 41, 59", // slate-800
+    mom: "30, 41, 59", // slate-800
     yoy: "5, 150, 105", // emerald-600
 }
 
