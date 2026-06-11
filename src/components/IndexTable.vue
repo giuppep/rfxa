@@ -11,7 +11,6 @@ defineProps<{ monthlyIndexValues: CumulativeIndexValue[] }>()
                 <th class="text-left">Date</th>
                 <th class="text-right">Value</th>
                 <th class="text-right">YoY</th>
-                <th class="text-right">YTD</th>
             </tr>
         </thead>
         <tbody>
@@ -29,9 +28,6 @@ defineProps<{ monthlyIndexValues: CumulativeIndexValue[] }>()
                 </td>
                 <td class="slashed-zero font-mono text-right">
                     {{ (100 * entry.cumulativeLast12Months).toFixed(2) }}%
-                </td>
-                <td class="slashed-zero font-mono text-right">
-                    {{ (100 * entry.cumulativeSinceYearStart).toFixed(2) }}%
                 </td>
             </tr>
         </tbody>
