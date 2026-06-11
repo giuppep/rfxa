@@ -13,16 +13,16 @@
     }
 
     table {
-        @apply bg-white;
+        @apply border-collapse bg-white text-sm;
     }
 
-    table > thead > th {
-        @apply font-medium text-left;
-        @apply px-3 py-2;
+    table > thead > tr > th {
+        @apply border-b border-slate-200 px-3 py-2;
+        @apply text-xs font-semibold uppercase tracking-wider text-slate-500;
     }
 
     table > tbody > tr {
-        @apply odd:bg-slate-200;
+        @apply border-b border-slate-100 last:border-b-0 hover:bg-slate-50;
     }
 
     td {
