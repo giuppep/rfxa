@@ -5,7 +5,7 @@
 @layer base {
     html,
     body {
-        @apply font-normal text-base text-gray-900;
+        @apply font-normal text-base text-gray-900 p-2;
     }
 
     h1 {
