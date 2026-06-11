@@ -14,6 +14,11 @@ const props = defineProps<{ type: IndexId }>()
 const indexValues = ref<IndexValue[]>([])
 const monthlyIndexValues = ref<CumulativeIndexValue[]>([])
 const chartSeries = ref<"value" | "ytd" | "yoy">("value")
+const SERIES_OPTIONS: { value: typeof chartSeries.value; label: string }[] = [
+    { value: "value", label: "Value" },
+    { value: "ytd", label: "YTD" },
+    { value: "yoy", label: "YoY" },
+]
 
 // Default to the trailing 12 months, from the 1st of the month 12 months
 // ago up to today. The user can adjust this range via the date inputs.
@@ -76,11 +81,20 @@ watchEffect(async () => {
             <IndexTable :monthly-index-values="monthlyIndexValues" />
             <div>
                 <div class="m-4 flex gap-2">
-                    <select v-model="chartSeries" class="border px-2 py-1">
-                        <option value="value">Value</option>
-                        <option value="ytd">YTD</option>
-                        <option value="yoy">YoY</option>
-                    </select>
+                    <button
+                        v-for="option in SERIES_OPTIONS"
+                        :key="option.value"
+                        type="button"
+                        class="rounded-full px-3 py-1 text-sm"
+                        :class="
+                            chartSeries === option.value
+                                ? 'bg-slate-500 text-slate-50'
+                                : 'bg-slate-100 text-slate-500 hover:bg-slate-400 hover:text-slate-50'
+                        "
+                        @click="chartSeries = option.value"
+                    >
+                        {{ option.label }}
+                    </button>
                 </div>
                 <IndexLineChart
                     :index-values="monthlyIndexValues"
