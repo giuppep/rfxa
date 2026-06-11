@@ -50,31 +50,39 @@ watchEffect(async () => {
 </script>
 
 <template>
-    <nav class="flex gap-2 px-4 py-2">
-        <RouterLink
-            v-for="index in ECONOMIC_INDICES"
-            :key="index.id"
-            :to="`/indices/${index.id}`"
-            class="bg-slate-100 rounded-md px-2 py-1 text-slate-500 hover:text-slate-50 hover:bg-slate-400"
-            exact-active-class="!text-slate-50 font-semibold bg-slate-500"
-        >
-            {{ index.label }}
-        </RouterLink>
-    </nav>
-    <div class="flex">
-        <IndexTable :monthly-index-values="monthlyIndexValues" />
-        <div>
-            <select v-model="chartSeries" class="m-4 border px-2 py-1">
-                <option value="value">Value</option>
-                <option value="ytd">YTD</option>
-                <option value="yoy">YoY</option>
-            </select>
-            <IndexLineChart
-                :index-values="monthlyIndexValues"
-                :period-start="periodStart"
-                :period-end="periodEnd"
-                :series="chartSeries"
-            />
+    <div class="p-4">
+        <div class="flex flex-col gap-0.5">
+            <span class="font-medium text-slate-700 text-sm">
+                Select one index:
+            </span>
+            <nav class="flex gap-2">
+                <RouterLink
+                    v-for="index in ECONOMIC_INDICES"
+                    :key="index.id"
+                    :to="`/indices/${index.id}`"
+                    class="bg-slate-100 rounded-md px-2 py-1 text-slate-500 hover:text-slate-50 hover:bg-slate-400"
+                    exact-active-class="!text-slate-50 bg-slate-500"
+                >
+                    {{ index.label }}
+                </RouterLink>
+            </nav>
+        </div>
+
+        <div class="flex">
+            <IndexTable :monthly-index-values="monthlyIndexValues" />
+            <div>
+                <select v-model="chartSeries" class="m-4 border px-2 py-1">
+                    <option value="value">Value</option>
+                    <option value="ytd">YTD</option>
+                    <option value="yoy">YoY</option>
+                </select>
+                <IndexLineChart
+                    :index-values="monthlyIndexValues"
+                    :period-start="periodStart"
+                    :period-end="periodEnd"
+                    :series="chartSeries"
+                />
+            </div>
         </div>
     </div>
 </template>
