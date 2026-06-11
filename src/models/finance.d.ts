@@ -7,5 +7,5 @@ export interface CumulativeIndexValue {
     date: Date
     value: number
     cumulativeSinceYearStart: number
-    cumulativeLast12Monhts: number
+    cumulativeLast12Months: number
 }

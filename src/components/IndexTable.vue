@@ -27,7 +27,7 @@ defineProps<{ monthlyIndexValues: CumulativeIndexValue[] }>()
                     {{ (100 * entry.value).toFixed(2) }}%
                 </td>
                 <td class="slashed-zero">
-                    {{ (100 * entry.cumulativeLast12Monhts).toFixed(2) }}%
+                    {{ (100 * entry.cumulativeLast12Months).toFixed(2) }}%
                 </td>
                 <td class="slashed-zero">
                     {{ (100 * entry.cumulativeSinceYearStart).toFixed(2) }}%

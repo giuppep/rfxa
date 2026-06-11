@@ -49,7 +49,7 @@ const seriesValue = (d: IndexValue | CumulativeIndexValue) => {
         case "ytd":
             return (d as CumulativeIndexValue).cumulativeSinceYearStart
         case "yoy":
-            return (d as CumulativeIndexValue).cumulativeLast12Monhts
+            return (d as CumulativeIndexValue).cumulativeLast12Months
         default:
             return d.value
     }

@@ -27,7 +27,7 @@ watchEffect(async () => {
     periodStart.value.setDate(1)
 
     // computeCumulativeIndexValues looks back up to 12 months from each
-    // entry to compute cumulativeLast12Monhts (YoY), so for the oldest
+    // entry to compute cumulativeLast12Months (YoY), so for the oldest
     // entry in the displayed range (periodStart) to have a full trailing
     // window, we need data going back another 12 months before that.
     const fetchPeriodStart = new Date(periodStart.value)

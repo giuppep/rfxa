@@ -27,7 +27,7 @@ export const computeCumulativeIndexValues = (indexValues: IndexValue[]) => {
                 )
             ),
             // FIXME: assumes input sorted in descending order
-            cumulativeLast12Monhts: computeCumulativeInterest(
+            cumulativeLast12Months: computeCumulativeInterest(
                 arr.slice(idx, idx + 12)
             ),
         } as CumulativeIndexValue
