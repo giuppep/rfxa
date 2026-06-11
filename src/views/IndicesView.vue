@@ -2,6 +2,7 @@
 import { ref, watchEffect } from "vue"
 import { IndexValue, CumulativeIndexValue } from "@/models/finance"
 import { bacenRequest } from "@/utils/bacen"
+import { ipeaRequest } from "@/utils/ipea"
 import IndexLineChart from "@/components/IndexLineChart.vue"
 import IndexTable from "@/components/IndexTable.vue"
 import { computeCumulativeIndexValues } from "@/utils/finance"
@@ -33,8 +34,8 @@ watchEffect(async () => {
     const fetchPeriodStart = new Date(periodStart.value)
     fetchPeriodStart.setMonth(fetchPeriodStart.getMonth() - 12)
 
-    console.log("Request", index, fetchPeriodStart, periodEnd.value)
-    indexValues.value = await bacenRequest(
+    const request = index.provider === "ipea" ? ipeaRequest : bacenRequest
+    indexValues.value = await request(
         index.url,
         fetchPeriodStart,
         periodEnd.value
