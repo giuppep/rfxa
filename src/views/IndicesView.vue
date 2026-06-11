@@ -50,11 +50,13 @@ watchEffect(async () => {
 </script>
 
 <template>
-    <nav class="flex gap-4 px-4 py-2">
+    <nav class="flex gap-2 px-4 py-2">
         <RouterLink
             v-for="index in ECONOMIC_INDICES"
             :key="index.id"
             :to="`/indices/${index.id}`"
+            class="bg-slate-100 rounded-md px-2 py-1 text-slate-500 hover:text-slate-50 hover:bg-slate-400"
+            exact-active-class="text-slate-50 font-semibold bg-slate-500"
         >
             {{ index.label }}
         </RouterLink>
