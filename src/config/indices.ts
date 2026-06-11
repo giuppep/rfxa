@@ -1,4 +1,4 @@
-export type IndexId = "cdi" | "selic" | "ipca"
+export type IndexId = "cdi" | "selic" | "ipca" | "igpm"
 
 export type IndexProvider = "bacen" | "ipea"
 
@@ -27,5 +27,11 @@ export const ECONOMIC_INDICES: IndexConfig[] = [
         label: "IPCA",
         provider: "bacen",
         url: "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json",
+    },
+    {
+        id: "igpm",
+        label: "IGP-M",
+        provider: "bacen",
+        url: "https://api.bcb.gov.br/dados/serie/bcdata.sgs.189/dados?formato=json",
     },
 ]
