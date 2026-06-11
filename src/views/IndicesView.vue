@@ -78,12 +78,8 @@ watchEffect(async () => {
                 <DateInput v-model="periodEnd" label="To" />
             </div>
         </div>
-        <div class="grid grid-cols-2">
-            <IndexTable
-                :monthly-index-values="monthlyIndexValues"
-                class="col-span-1"
-            />
-            <div class="col-span-1">
+        <div class="grid md:grid-cols-3 grid-cols-1">
+            <div class="col-span-2">
                 <div class="m-4 flex gap-2">
                     <button
                         v-for="option in SERIES_OPTIONS"
@@ -107,6 +103,10 @@ watchEffect(async () => {
                     :series="chartSeries"
                 />
             </div>
+            <IndexTable
+                :monthly-index-values="monthlyIndexValues"
+                class="col-span-1"
+            />
         </div>
     </div>
 </template>
