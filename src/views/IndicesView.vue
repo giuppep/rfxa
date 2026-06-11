@@ -3,6 +3,7 @@ import { ref, watchEffect } from "vue"
 import { IndexValue, CumulativeIndexValue } from "@/models/finance"
 import { bacenRequest } from "@/utils/bacen"
 import { ipeaRequest } from "@/utils/ipea"
+import DateInput from "@/components/DateInput.vue"
 import IndexLineChart from "@/components/IndexLineChart.vue"
 import IndexTable from "@/components/IndexTable.vue"
 import { computeCumulativeIndexValues } from "@/utils/finance"
@@ -12,20 +13,18 @@ const props = defineProps<{ type: IndexId }>()
 
 const indexValues = ref<IndexValue[]>([])
 const monthlyIndexValues = ref<CumulativeIndexValue[]>([])
-const periodStart = ref(new Date())
-const periodEnd = ref(new Date())
 const chartSeries = ref<"value" | "ytd" | "yoy">("value")
+
+// Default to the trailing 12 months, from the 1st of the month 12 months
+// ago up to today. The user can adjust this range via the date inputs.
+const periodEnd = ref(new Date())
+const periodStart = ref(new Date(periodEnd.value))
+periodStart.value.setMonth(periodStart.value.getMonth() - 12)
+periodStart.value.setDate(1)
 
 watchEffect(async () => {
     const index = ECONOMIC_INDICES.find((index) => index.id === props.type)
     if (!index) return
-
-    // The displayed range is the trailing 12 months, from the 1st of the
-    // month 12 months ago up to today.
-    periodEnd.value = new Date()
-    periodStart.value = new Date(periodEnd.value)
-    periodStart.value.setMonth(periodStart.value.getMonth() - 12)
-    periodStart.value.setDate(1)
 
     // computeCumulativeIndexValues looks back up to 12 months from each
     // entry to compute cumulativeLast12Months (YoY), so for the oldest
@@ -71,11 +70,15 @@ watchEffect(async () => {
         <div class="flex">
             <IndexTable :monthly-index-values="monthlyIndexValues" />
             <div>
-                <select v-model="chartSeries" class="m-4 border px-2 py-1">
-                    <option value="value">Value</option>
-                    <option value="ytd">YTD</option>
-                    <option value="yoy">YoY</option>
-                </select>
+                <div class="m-4 flex gap-2">
+                    <DateInput v-model="periodStart" label="From" />
+                    <DateInput v-model="periodEnd" label="To" />
+                    <select v-model="chartSeries" class="border px-2 py-1">
+                        <option value="value">Value</option>
+                        <option value="ytd">YTD</option>
+                        <option value="yoy">YoY</option>
+                    </select>
+                </div>
                 <IndexLineChart
                     :index-values="monthlyIndexValues"
                     :period-start="periodStart"
