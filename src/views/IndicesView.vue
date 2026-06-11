@@ -18,18 +18,32 @@ watchEffect(async () => {
     const index = ECONOMIC_INDICES.find((index) => index.id === props.type)
     if (!index) return
 
+    // The displayed range is the trailing 12 months, from the 1st of the
+    // month 12 months ago up to today.
     periodEnd.value = new Date()
     periodStart.value = new Date(periodEnd.value)
     periodStart.value.setMonth(periodStart.value.getMonth() - 12)
     periodStart.value.setDate(1)
 
-    console.log("Request", index, periodStart.value, periodEnd.value)
+    // computeCumulativeIndexValues looks back up to 12 months from each
+    // entry to compute cumulativeLast12Monhts (YoY), so for the oldest
+    // entry in the displayed range (periodStart) to have a full trailing
+    // window, we need data going back another 12 months before that.
+    const fetchPeriodStart = new Date(periodStart.value)
+    fetchPeriodStart.setMonth(fetchPeriodStart.getMonth() - 12)
+
+    console.log("Request", index, fetchPeriodStart, periodEnd.value)
     indexValues.value = await bacenRequest(
         index.url,
-        periodStart.value,
+        fetchPeriodStart,
         periodEnd.value
     )
-    monthlyIndexValues.value = computeCumulativeIndexValues(indexValues.value)
+
+    // Compute cumulative values over the full (24-month) series, then trim
+    // back down to the displayed range (12 months) for the table/chart.
+    monthlyIndexValues.value = computeCumulativeIndexValues(
+        indexValues.value
+    ).filter((indexValue) => indexValue.date >= periodStart.value)
 })
 </script>
 
