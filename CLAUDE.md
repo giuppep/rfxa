@@ -20,14 +20,16 @@ maps to `./src/*`.
 ### Data flow
 
 1. `src/config/indices.ts` defines `ECONOMIC_INDICES`: a list of
-   `{ id: IndexId, label, url }` mapping each index (`"cdi" | "selic" | "ipca"`)
-   to a source URL.
+   `{ id: IndexId, label, provider, url }` mapping each index (`"cdi" |
+   "selic" | "ipca"`) to a source URL and a `provider` (`"bacen" | "ipea"`)
+   that determines which `*Request` helper fetches it.
 2. `src/views/IndicesView.vue` is rendered at `/indices/:type` (`type` is an
    `IndexId` passed via route props). On change it:
    - computes the displayed period as the trailing 12 months,
-   - fetches an extra 12 months *before* that (24 months total) via a
-     `*Request` helper from `src/utils/`, because YoY needs a trailing
-     12-month window for every displayed point,
+   - picks `bacenRequest` or `ipeaRequest` based on `index.provider` and
+     fetches an extra 12 months *before* the displayed period (24 months
+     total), because YoY needs a trailing 12-month window for every
+     displayed point,
    - runs `computeCumulativeIndexValues` over the full 24-month series, then
      filters back down to the displayed 12-month range.
 3. The result (`CumulativeIndexValue[]`) is passed to `IndexTable` and
