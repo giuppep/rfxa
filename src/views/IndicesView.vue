@@ -13,6 +13,7 @@ const indexValues = ref<IndexValue[]>([])
 const monthlyIndexValues = ref<CumulativeIndexValue[]>([])
 const periodStart = ref(new Date())
 const periodEnd = ref(new Date())
+const chartSeries = ref<"value" | "ytd" | "yoy">("value")
 
 watchEffect(async () => {
     const index = ECONOMIC_INDICES.find((index) => index.id === props.type)
@@ -59,12 +60,18 @@ watchEffect(async () => {
     </nav>
     <div class="flex">
         <IndexTable :monthly-index-values="monthlyIndexValues" />
-        <IndexLineChart
-            :index-values="monthlyIndexValues"
-            :period-start="periodStart"
-            :period-end="periodEnd"
-            show-yoy
-            show-ytd
-        />
+        <div>
+            <select v-model="chartSeries" class="m-4 border px-2 py-1">
+                <option value="value">Value</option>
+                <option value="ytd">YTD</option>
+                <option value="yoy">YoY</option>
+            </select>
+            <IndexLineChart
+                :index-values="monthlyIndexValues"
+                :period-start="periodStart"
+                :period-end="periodEnd"
+                :series="chartSeries"
+            />
+        </div>
     </div>
 </template>

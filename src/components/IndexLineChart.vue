@@ -10,9 +10,7 @@ import {
     TimeScale,
     Filler,
     Tooltip,
-    Legend,
     type ChartData,
-    type ChartDataset,
     type ChartOptions,
 } from "chart.js"
 import "chartjs-adapter-date-fns"
@@ -25,118 +23,103 @@ ChartJS.register(
     LinearScale,
     TimeScale,
     Filler,
-    Tooltip,
-    Legend
+    Tooltip
 )
 
-const props = defineProps<{
-    indexValues: IndexValue[] | CumulativeIndexValue[]
-    periodStart: Date
-    periodEnd: Date
-    /** Also plot the cumulative value since the start of the year. Requires `indexValues` to be `CumulativeIndexValue[]`. */
-    showYtd?: boolean
-    /** Also plot the cumulative value over the trailing 12 months. Requires `indexValues` to be `CumulativeIndexValue[]`. */
-    showYoy?: boolean
-}>()
+const props = withDefaults(
+    defineProps<{
+        indexValues: IndexValue[] | CumulativeIndexValue[]
+        periodStart: Date
+        periodEnd: Date
+        /** Which value to plot. "ytd"/"yoy" require `indexValues` to be `CumulativeIndexValue[]`. */
+        series?: "value" | "ytd" | "yoy"
+    }>(),
+    { series: "value" }
+)
+
+// rgb triplets so both the line and its translucent fill can share a color.
+const SERIES_COLOR: Record<typeof props.series, string> = {
+    value: "30, 41, 59", // slate-800
+    ytd: "37, 99, 235", // blue-600
+    yoy: "5, 150, 105", // emerald-600
+}
+
+const seriesValue = (d: IndexValue | CumulativeIndexValue) => {
+    switch (props.series) {
+        case "ytd":
+            return (d as CumulativeIndexValue).cumulativeSinceYearStart
+        case "yoy":
+            return (d as CumulativeIndexValue).cumulativeLast12Monhts
+        default:
+            return d.value
+    }
+}
 
 const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
     () => {
-        const datasets: ChartDataset<"line", { x: number; y: number }[]>[] = [
-            {
-                label: "Value",
-                data: props.indexValues.map((d) => ({
-                    x: d.date.valueOf(),
-                    y: d.value,
-                })),
-                borderColor: "#1e293b",
-                backgroundColor: "rgba(30, 41, 59, 0.08)",
-                fill: true,
-                tension: 0.1,
-                borderWidth: 2,
-                pointRadius: 0,
-                pointHoverRadius: 4,
-                pointHoverBackgroundColor: "#1e293b",
-            },
-        ]
-
-        if (props.showYtd) {
-            datasets.push({
-                label: "YTD",
-                data: (props.indexValues as CumulativeIndexValue[]).map(
-                    (d) => ({
+        const color = SERIES_COLOR[props.series]
+        return {
+            datasets: [
+                {
+                    data: props.indexValues.map((d) => ({
                         x: d.date.valueOf(),
-                        y: d.cumulativeSinceYearStart,
-                    })
-                ),
-                borderColor: "#2563eb",
-                fill: false,
-                tension: 0.1,
-                borderWidth: 2,
-                pointRadius: 0,
-                pointHoverRadius: 4,
-                pointHoverBackgroundColor: "#2563eb",
-                yAxisID: "y1",
-            })
+                        y: seriesValue(d),
+                    })),
+                    borderColor: `rgb(${color})`,
+                    backgroundColor: `rgba(${color}, 0.08)`,
+                    fill: true,
+                    tension: 0.1,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    pointHoverBackgroundColor: `rgb(${color})`,
+                },
+            ],
         }
-
-        if (props.showYoy) {
-            datasets.push({
-                label: "YoY",
-                data: (props.indexValues as CumulativeIndexValue[]).map(
-                    (d) => ({
-                        x: d.date.valueOf(),
-                        y: d.cumulativeLast12Monhts,
-                    })
-                ),
-                borderColor: "#059669",
-                fill: false,
-                tension: 0.1,
-                borderWidth: 2,
-                pointRadius: 0,
-                pointHoverRadius: 4,
-                pointHoverBackgroundColor: "#059669",
-                yAxisID: "y1",
-            })
-        }
-
-        return { datasets }
     }
+)
+
+// indexValues is sorted newest-first, so the last entry is the oldest date
+// and the first entry is the most recent. Use these as the axis bounds
+// instead of periodStart/periodEnd so we don't show ticks for months we
+// don't have data for (e.g. the current month before BACEN publishes it).
+const xMin = computed(() => {
+    // YTD always starts from the beginning of the current year, regardless
+    // of how far back the rest of the displayed data goes.
+    if (props.series === "ytd")
+        return new Date(props.periodEnd.getFullYear(), 0, 1).valueOf()
+
+    return props.indexValues.length > 0
+        ? props.indexValues[props.indexValues.length - 1].date.valueOf()
+        : props.periodStart.valueOf()
+})
+
+const xMax = computed(() =>
+    props.indexValues.length > 0
+        ? props.indexValues[0].date.valueOf()
+        : props.periodEnd.valueOf()
 )
 
 const chartOptions = computed<ChartOptions<"line">>(() => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-        legend: {
-            display: !!(props.showYtd || props.showYoy),
-        },
         tooltip: {
             callbacks: {
-                label: (ctx) =>
-                    `${ctx.dataset.label}: ${(100 * (ctx.parsed.y ?? 0)).toFixed(2)}%`,
+                label: (ctx) => `${(100 * (ctx.parsed.y ?? 0)).toFixed(2)}%`,
             },
         },
     },
     scales: {
         x: {
             type: "time",
-            min: props.periodStart.valueOf(),
-            max: props.periodEnd.valueOf(),
+            min: xMin.value,
+            max: xMax.value,
             time: { unit: "month" },
             grid: { display: false },
         },
         y: {
-            position: "left",
             grid: { color: "#f1f5f9" },
-            ticks: {
-                callback: (value) => `${(100 * Number(value)).toFixed(1)}%`,
-            },
-        },
-        y1: {
-            type: "linear",
-            position: "right",
-            display: !!(props.showYtd || props.showYoy),
-            grid: { drawOnChartArea: false },
             ticks: {
                 callback: (value) => `${(100 * Number(value)).toFixed(1)}%`,
             },
