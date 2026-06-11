@@ -115,7 +115,11 @@ const chartOptions = computed<ChartOptions<"line">>(() => ({
             type: "time",
             min: xMin.value,
             max: xMax.value,
-            time: { unit: "month" },
+            time: {
+                unit: "month",
+                tooltipFormat: "MMM yy",
+                displayFormats: { month: "MMM yy" },
+            },
             grid: { display: false },
         },
         y: {

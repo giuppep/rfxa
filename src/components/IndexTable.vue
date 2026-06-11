@@ -19,7 +19,8 @@ defineProps<{ monthlyIndexValues: CumulativeIndexValue[] }>()
                 <td class="capitalize">
                     {{
                         Intl.DateTimeFormat("en-GB", {
-                            month: "long",
+                            month: "short",
+                            year: "numeric",
                         }).format(entry.date)
                     }}
                 </td>
