@@ -49,6 +49,11 @@ Both helpers share the signature `(url, periodStart?, periodEnd?) =>
 Promise<IndexValue[]>` and return results **sorted descending by date**
 (newest first) — this ordering is required by `computeCumulativeIndexValues`.
 
+- `cache.ts` (`cachedIndexRequest`) — wraps `bacenRequest`/`ipeaRequest` with
+  a `sessionStorage` cache keyed by index id, provider and time span
+  (`periodStart`/`periodEnd`, date-only), so navigating between indices or
+  re-rendering doesn't refetch the same data.
+
 `public/cdi.json` and `public/cdi-ipea.json` are static fixtures (raw
 BACEN/IPEA response shapes) downloaded to avoid hitting the live APIs during
 development.
