@@ -1,7 +1,30 @@
 <script setup lang="ts">
+import { computed } from "vue"
+import { Line } from "vue-chartjs"
+import {
+    Chart as ChartJS,
+    LineController,
+    LineElement,
+    PointElement,
+    LinearScale,
+    TimeScale,
+    Filler,
+    Tooltip,
+    type ChartData,
+    type ChartOptions,
+} from "chart.js"
+import "chartjs-adapter-date-fns"
 import { IndexValue, CumulativeIndexValue } from "@/models/finance"
-import * as d3 from "d3"
-import { ref, computed, watchEffect } from "vue"
+
+ChartJS.register(
+    LineController,
+    LineElement,
+    PointElement,
+    LinearScale,
+    TimeScale,
+    Filler,
+    Tooltip
+)
 
 const props = defineProps<{
     indexValues: IndexValue[] | CumulativeIndexValue[]
@@ -9,83 +32,57 @@ const props = defineProps<{
     periodEnd: Date
 }>()
 
-const width = 680
-const height = 400
-const marginTop = 20
-const marginRight = 20
-const marginBottom = 30
-const marginLeft = 40
-
-// Declare the x (horizontal position) scale.
-const x = computed(() =>
-    d3
-        .scaleUtc()
-        .domain([props.periodStart, props.periodEnd])
-        .range([marginLeft, width - marginRight])
+const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
+    () => ({
+        datasets: [
+            {
+                data: props.indexValues.map((d) => ({
+                    x: d.date.valueOf(),
+                    y: d.value,
+                })),
+                borderColor: "#1e293b",
+                backgroundColor: "rgba(30, 41, 59, 0.08)",
+                fill: true,
+                tension: 0.1,
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                pointHoverBackgroundColor: "#1e293b",
+            },
+        ],
+    })
 )
 
-// Declare the y (vertical position) scale.
-const y = d3
-    .scaleLinear()
-    // .domain([0, 1])
-    .domain([0, 0.02])
-    .range([height - marginBottom, marginTop])
-
-const line = d3
-    .line<IndexValue>()
-    .x((d) => x.value(d.date))
-    .y((d) => y(d.value))
-
-const gy = ref<SVGGElement | null>(null)
-const gx = ref<SVGGElement | null>(null)
-
-watchEffect(() => {
-    if (gx.value) d3.select(gx.value).call(d3.axisBottom(x.value))
-    if (gy.value)
-        d3.select(gy.value).call(d3.axisLeft(y).tickFormat(d3.format(".1%")))
-})
+const chartOptions = computed<ChartOptions<"line">>(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        tooltip: {
+            callbacks: {
+                label: (ctx) => `${(100 * (ctx.parsed.y ?? 0)).toFixed(2)}%`,
+            },
+        },
+    },
+    scales: {
+        x: {
+            type: "time",
+            min: props.periodStart.valueOf(),
+            max: props.periodEnd.valueOf(),
+            time: { unit: "month" },
+            grid: { display: false },
+        },
+        y: {
+            grid: { color: "#f1f5f9" },
+            ticks: {
+                callback: (value) => `${(100 * Number(value)).toFixed(1)}%`,
+            },
+        },
+    },
+}))
 </script>
 
 <template>
-    <svg
-        :width="width"
-        :height="height"
-        v-if="indexValues.length > 0"
-        class="m-4 border-gray-400 border-2"
-    >
-        <path
-            fill="none"
-            stroke="black"
-            stroke-width="1.5"
-            :d="line(indexValues) || ''"
-        />
-        <g fill="white" stroke="currentColor" stroke-width="1.5">
-            <g ref="gy" :transform="`translate(${marginLeft},0)`" />
-            <g ref="gx" :transform="`translate(0,${height - marginBottom})`" />
-            <g v-for="(d, i) in indexValues">
-                <circle
-                    :key="i"
-                    :cx="x(d.date)"
-                    :cy="y(d.value)"
-                    r="4"
-                    class="peer hover:fill-slate-500 cursor-pointer"
-                />
-                <foreignObject
-                    :x="x(d.date)"
-                    :y="y(d.value) - 30"
-                    width="100%"
-                    height="100%"
-                    class="hidden peer-hover:block"
-                >
-                    <div>
-                        <span
-                            class="text-xs font-medium p-1 bg-slate-100 rounded-md border-[1px] shadow-sm"
-                        >
-                            {{ (100 * d.value).toFixed(2) }}%
-                        </span>
-                    </div>
-                </foreignObject>
-            </g>
-        </g>
-    </svg>
+    <div class="h-80 w-full max-w-2xl p-4">
+        <Line :data="chartData" :options="chartOptions" />
+    </div>
 </template>
