@@ -8,10 +8,10 @@ defineProps<{ monthlyIndexValues: CumulativeIndexValue[] }>()
     <table>
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Value</th>
-                <th>YoY</th>
-                <th>YTD</th>
+                <th class="text-left">Date</th>
+                <th class="text-right">Value</th>
+                <th class="text-right">YoY</th>
+                <th class="text-right">YTD</th>
             </tr>
         </thead>
         <tbody>
@@ -23,13 +23,13 @@ defineProps<{ monthlyIndexValues: CumulativeIndexValue[] }>()
                         }).format(entry.date)
                     }}
                 </td>
-                <td class="slashed-zero">
+                <td class="slashed-zero font-mono text-right">
                     {{ (100 * entry.value).toFixed(2) }}%
                 </td>
-                <td class="slashed-zero">
+                <td class="slashed-zero font-mono text-right">
                     {{ (100 * entry.cumulativeLast12Months).toFixed(2) }}%
                 </td>
-                <td class="slashed-zero">
+                <td class="slashed-zero font-mono text-right">
                     {{ (100 * entry.cumulativeSinceYearStart).toFixed(2) }}%
                 </td>
             </tr>
