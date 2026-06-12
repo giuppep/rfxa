@@ -6,12 +6,17 @@ const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         { path: "/", name: "home", component: HomeView },
-        { path: "/indices", redirect: "/indices/cdi" },
         {
-            path: "/indices/:type",
-            name: "indices",
-            component: IndicesView,
-            props: true,
+            path: "/indices",
+            redirect: "/indices/cdi",
+            children: [
+                {
+                    path: "/indices/:type",
+                    name: "indices",
+                    component: IndicesView,
+                    props: true,
+                },
+            ],
         },
     ],
 })
