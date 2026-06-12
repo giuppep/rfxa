@@ -17,7 +17,11 @@
     }
 
     table {
-        @apply border-collapse bg-white text-sm;
+        @apply w-full border-collapse bg-white text-sm;
+    }
+
+    table > thead {
+        @apply sticky top-0 bg-white;
     }
 
     table > thead > tr > th {
