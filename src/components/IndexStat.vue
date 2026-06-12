@@ -22,11 +22,11 @@ const period = computed(() => {
 </script>
 
 <template>
-    <div class="rounded-lg bg-white p-4 shadow-xs">
-        <div class="text-sm font-medium text-slate-500">{{ label }}</div>
+    <div class="rounded-lg bg-white p-4 shadow-sm">
+        <div class="text-sm font-medium text-olive-600">{{ label }}</div>
         <div class="slashed-zero font-mono text-2xl font-semibold">
             {{ (100 * value).toFixed(2) }}%
         </div>
-        <div class="text-xs capitalize text-slate-400">{{ period }}</div>
+        <div class="text-xs capitalize text-olive-400">{{ period }}</div>
     </div>
 </template>

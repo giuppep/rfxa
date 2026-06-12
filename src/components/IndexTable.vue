@@ -7,7 +7,7 @@ defineProps<{ monthlyIndexValues: CumulativeIndexValue[] }>()
 <template>
     <div class="max-h-96 overflow-y-auto">
         <table>
-            <thead>
+            <thead class="sticky top-0 bg-olive-50">
                 <tr>
                     <th class="text-left">Date</th>
                     <th class="text-right">MoM</th>

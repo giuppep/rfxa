@@ -32,7 +32,7 @@ layer(base);
 @layer base {
     html,
     body {
-        @apply font-normal text-base text-gray-900;
+        @apply font-normal text-base text-olive-900 bg-olive-50;
     }
 
     h1 {
@@ -40,20 +40,16 @@ layer(base);
     }
 
     table {
-        @apply w-full border-collapse bg-white text-sm;
-    }
-
-    table > thead {
-        @apply sticky top-0 bg-white;
+        @apply w-full border-collapse text-sm;
     }
 
     table > thead > tr > th {
-        @apply border-b border-slate-200 px-3 py-2;
-        @apply text-xs font-semibold uppercase tracking-wider text-slate-500;
+        @apply border-b border-olive-200 px-3 py-2;
+        @apply text-xs font-semibold uppercase tracking-wider text-olive-500;
     }
 
     table > tbody > tr {
-        @apply border-b border-slate-100 last:border-b-0 hover:bg-slate-50;
+        @apply border-b border-olive-100 last:border-b-0 hover:bg-olive-50;
     }
 
     td {
