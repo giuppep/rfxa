@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watchEffect } from "vue"
+import { PhSpinnerGap } from "@phosphor-icons/vue"
 import { IndexValue, CumulativeIndexValue } from "@/models/finance"
 import { bacenRequest } from "@/utils/bacen"
 import { ipeaRequest } from "@/utils/ipea"
@@ -14,6 +15,7 @@ const props = defineProps<{ type: IndexId }>()
 
 const indexValues = ref<IndexValue[]>([])
 const monthlyIndexValues = ref<CumulativeIndexValue[]>([])
+const loading = ref(false)
 const chartSeries = ref<"mom" | "yoy">("mom")
 const SERIES_OPTIONS: { value: typeof chartSeries.value; label: string }[] = [
     { value: "mom", label: "MoM" },
@@ -38,6 +40,7 @@ watchEffect(async () => {
     const fetchPeriodStart = new Date(periodStart.value)
     fetchPeriodStart.setMonth(fetchPeriodStart.getMonth() - 12)
 
+    loading.value = true
     const request = index.provider === "ipea" ? ipeaRequest : bacenRequest
     indexValues.value = await cachedIndexRequest(
         request,
@@ -45,6 +48,7 @@ watchEffect(async () => {
         fetchPeriodStart,
         periodEnd.value
     )
+    loading.value = false
 
     // Compute cumulative values over the full (24-month) series, then trim
     // back down to the displayed range (12 months) for the table/chart.
@@ -78,7 +82,14 @@ watchEffect(async () => {
                 <DateInput v-model="periodEnd" label="To" />
             </div>
         </div>
-        <div class="grid md:grid-cols-3 grid-cols-1">
+        <div class="relative grid md:grid-cols-3 grid-cols-1">
+            <div
+                v-if="loading"
+                class="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-sm text-slate-400"
+            >
+                <PhSpinnerGap class="h-8 w-8 animate-spin" />
+                Loading...
+            </div>
             <div class="col-span-2">
                 <div class="m-4 flex gap-2">
                     <button
