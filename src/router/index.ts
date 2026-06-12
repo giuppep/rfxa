@@ -8,6 +8,7 @@ const router = createRouter({
         { path: "/", name: "home", component: HomeView },
         {
             path: "/indices",
+            name: "indices-root",
             redirect: "/indices/cdi",
             children: [
                 {
