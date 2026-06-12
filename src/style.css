@@ -8,10 +8,6 @@
         @apply font-normal text-base text-gray-900;
     }
 
-    body {
-        @apply p-4 md:p-6;
-    }
-
     h1 {
         @apply text-5xl font-black;
     }
