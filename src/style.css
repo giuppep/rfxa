@@ -5,7 +5,11 @@
 @layer base {
     html,
     body {
-        @apply font-normal text-base text-gray-900 p-2;
+        @apply font-normal text-base text-gray-900;
+    }
+
+    body {
+        @apply p-4 md:p-6;
     }
 
     h1 {
