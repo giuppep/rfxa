@@ -125,7 +125,7 @@ watchEffect(async () => {
                     <RouterLink
                         v-for="index in ECONOMIC_INDICES"
                         :key="index.id"
-                        :to="`/indices/${index.id}`"
+                        :to="{ name: 'indices', params: { type: index.id } }"
                         class="rounded-md px-2 py-1 bg-olive-200 text-olive-700 hover:text-olive-50 hover:bg-olive-400"
                         exact-active-class="text-olive-50! bg-olive-500"
                     >
