@@ -32,7 +32,7 @@ const props = withDefaults(
         periodStart: Date
         periodEnd: Date
         /** Which value to plot. "yoy" requires `indexValues` to be `CumulativeIndexValue[]`. */
-        series?: "mom" | "yoy"
+        series?: "mom" | "yoy" | "total"
     }>(),
     { series: "mom" }
 )
@@ -41,6 +41,7 @@ const props = withDefaults(
 const SERIES_COLOR: Record<typeof props.series, string> = {
     mom: "30, 41, 59", // slate-800
     yoy: "5, 150, 105", // emerald-600
+    total: "37, 99, 235", // blue-600
 }
 
 const seriesValue = (d: IndexValue | CumulativeIndexValue) => {

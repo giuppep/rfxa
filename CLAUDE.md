@@ -71,10 +71,26 @@ development.
 ### Chart (`src/components/IndexLineChart.vue`)
 
 Built with Chart.js (`vue-chartjs`) + `chartjs-adapter-date-fns` for the time
-scale. Displays **one series at a time** via the `series: "value" | "yoy"`
-prop (selected in `IndicesView.vue`). The x-axis range is derived from the
-actual data (`indexValues[0]`/`indexValues[last]`, since data is descending)
-rather than `periodStart`/`periodEnd`.
+scale. Displays **one series at a time** via the `series: "mom" | "yoy" |
+"total"` prop (selected in `IndicesView.vue`). The x-axis range is derived
+from the actual data (`indexValues[0]`/`indexValues[last]`, since data is
+descending) rather than `periodStart`/`periodEnd`.
+
+For `"total"`, `IndicesView.vue` passes `cumulativeTotalSeries` instead of
+`monthlyIndexValues`: the cumulative growth of 1 unit invested at
+`periodStart`, computed by reversing `monthlyIndexValues` to ascending order,
+running `computeCumulativeInterest` cumulatively, then reversing back to
+descending.
+
+### Current-period stats (`src/components/IndexStat.vue`)
+
+`IndicesView.vue` renders four `IndexStat` widgets (Current MoM, Current YoY,
+Current YTD, Total) above the chart/table, each showing a value and the date
+range it covers (`periodStart`/`periodEnd`, rendered as a single month if
+they're the same, otherwise `"MMM yyyy - MMM yyyy"`). YTD and Total use
+`computeCumulativeInterest` (exported from `utils/finance.ts`) over,
+respectively, the current year's entries in `indexValues` and the full
+displayed `monthlyIndexValues`.
 
 ### Routing
 

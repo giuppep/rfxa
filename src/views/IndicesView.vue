@@ -20,10 +20,11 @@ const props = defineProps<{ type: IndexId }>()
 const indexValues = ref<IndexValue[]>([])
 const monthlyIndexValues = ref<CumulativeIndexValue[]>([])
 const loading = ref(false)
-const chartSeries = ref<"mom" | "yoy">("mom")
+const chartSeries = ref<"mom" | "yoy" | "total">("mom")
 const SERIES_OPTIONS: { value: typeof chartSeries.value; label: string }[] = [
     { value: "mom", label: "MoM" },
     { value: "yoy", label: "YoY" },
+    { value: "total", label: "Total" },
 ]
 
 // monthlyIndexValues is sorted descending by date, so the first entry is
@@ -59,9 +60,23 @@ const oldest = computed(
     () => monthlyIndexValues.value[monthlyIndexValues.value.length - 1]
 )
 
-const currentTotal = computed(() =>
-    computeCumulativeInterest(monthlyIndexValues.value)
-)
+// Cumulative growth of 1 unit invested at periodStart, evaluated at each
+// month in the displayed range. monthlyIndexValues is sorted descending, so
+// it's reversed to accumulate from the oldest month, then reversed back.
+const cumulativeTotalSeries = computed<IndexValue[]>(() => {
+    let cumulative = 1
+    return [...monthlyIndexValues.value]
+        .reverse()
+        .map((indexValue) => {
+            cumulative *= 1 + indexValue.value
+            return { date: indexValue.date, value: cumulative - 1 }
+        })
+        .reverse()
+})
+
+// The first entry of cumulativeTotalSeries is the cumulative growth over the
+// whole displayed range.
+const currentTotal = computed(() => cumulativeTotalSeries.value[0]?.value ?? 0)
 
 // Default to the trailing 12 months, from the 1st of the month 12 months
 // ago up to today. The user can adjust this range via the date inputs.
@@ -175,7 +190,11 @@ watchEffect(async () => {
                     </button>
                 </div>
                 <IndexLineChart
-                    :index-values="monthlyIndexValues"
+                    :index-values="
+                        chartSeries === 'total'
+                            ? cumulativeTotalSeries
+                            : monthlyIndexValues
+                    "
                     :period-start="periodStart"
                     :period-end="periodEnd"
                     :series="chartSeries"
