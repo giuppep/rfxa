@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { useRoute } from "vue-router"
-
-const route = useRoute()
-const navItems = [{ label: "Indices", to: "/indices", name: "indices" }]
+const navItems = [{ label: "Indices", to: "/indices" }]
 </script>
 
 <template>
