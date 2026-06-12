@@ -127,7 +127,7 @@ watchEffect(async () => {
                         :key="index.id"
                         :to="`/indices/${index.id}`"
                         class="bg-slate-100 rounded-md px-2 py-1 text-slate-500 hover:text-slate-50 hover:bg-slate-400"
-                        exact-active-class="!text-slate-50 bg-slate-500"
+                        exact-active-class="text-slate-50! bg-slate-500"
                     >
                         {{ index.label }}
                     </RouterLink>
@@ -167,7 +167,7 @@ watchEffect(async () => {
         <div class="relative grid md:grid-cols-3 grid-cols-1">
             <div
                 v-if="loading"
-                class="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-sm text-slate-400"
+                class="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-xs text-slate-400"
             >
                 <PhSpinnerGap class="h-8 w-8 animate-spin" />
                 Loading...
