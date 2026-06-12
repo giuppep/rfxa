@@ -3,7 +3,7 @@ import { IndexValue, CumulativeIndexValue } from "@/models/finance"
 /** Given a time series of interest rates, it computes the cumulative interest over the
  *  whole period.
  */
-const computeCumulativeInterest = (indexValues: IndexValue[]) => {
+export const computeCumulativeInterest = (indexValues: IndexValue[]) => {
     const interest = indexValues.reduce(
         (cumulativeInterest, indexValue) =>
             cumulativeInterest * (1 + indexValue.value),

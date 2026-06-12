@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue"
+import { computed, ref, watchEffect } from "vue"
 import { PhSpinnerGap } from "@phosphor-icons/vue"
 import { IndexValue, CumulativeIndexValue } from "@/models/finance"
 import { bacenRequest } from "@/utils/bacen"
@@ -7,8 +7,12 @@ import { ipeaRequest } from "@/utils/ipea"
 import { cachedIndexRequest } from "@/utils/cache"
 import DateInput from "@/components/DateInput.vue"
 import IndexLineChart from "@/components/IndexLineChart.vue"
+import IndexStat from "@/components/IndexStat.vue"
 import IndexTable from "@/components/IndexTable.vue"
-import { computeCumulativeIndexValues } from "@/utils/finance"
+import {
+    computeCumulativeIndexValues,
+    computeCumulativeInterest,
+} from "@/utils/finance"
 import { ECONOMIC_INDICES, IndexId } from "@/config/indices"
 
 const props = defineProps<{ type: IndexId }>()
@@ -21,6 +25,43 @@ const SERIES_OPTIONS: { value: typeof chartSeries.value; label: string }[] = [
     { value: "mom", label: "MoM" },
     { value: "yoy", label: "YoY" },
 ]
+
+// monthlyIndexValues is sorted descending by date, so the first entry is
+// the most recent month.
+const latest = computed(() => monthlyIndexValues.value[0])
+
+// indexValues covers 12 months before periodStart (for the YoY lookback), so
+// it always reaches back to January of latest's year, regardless of the
+// selected period.
+const currentYtd = computed(() => {
+    if (!latest.value) return 0
+
+    const year = latest.value.date.getFullYear()
+    return computeCumulativeInterest(
+        indexValues.value.filter((iv) => iv.date.getFullYear() === year)
+    )
+})
+
+// cumulativeLast12Months covers the latest month plus the 11 preceding ones.
+const yoyPeriodStart = computed(() => {
+    const date = new Date(latest.value?.date ?? 0)
+    date.setMonth(date.getMonth() - 11)
+    return date
+})
+
+const ytdPeriodStart = computed(
+    () => new Date(latest.value?.date.getFullYear() ?? 0, 0, 1)
+)
+
+// monthlyIndexValues is sorted descending by date, so the last entry is the
+// oldest month in the displayed range.
+const oldest = computed(
+    () => monthlyIndexValues.value[monthlyIndexValues.value.length - 1]
+)
+
+const currentTotal = computed(() =>
+    computeCumulativeInterest(monthlyIndexValues.value)
+)
 
 // Default to the trailing 12 months, from the 1st of the month 12 months
 // ago up to today. The user can adjust this range via the date inputs.
@@ -81,6 +122,32 @@ watchEffect(async () => {
                 <DateInput v-model="periodStart" label="From" />
                 <DateInput v-model="periodEnd" label="To" />
             </div>
+        </div>
+        <div v-if="latest" class="flex gap-4 mb-4">
+            <IndexStat
+                label="Current MoM"
+                :value="latest.value"
+                :period-start="latest.date"
+                :period-end="latest.date"
+            />
+            <IndexStat
+                label="Current YoY"
+                :value="latest.cumulativeLast12Months"
+                :period-start="yoyPeriodStart"
+                :period-end="latest.date"
+            />
+            <IndexStat
+                label="Current YTD"
+                :value="currentYtd"
+                :period-start="ytdPeriodStart"
+                :period-end="latest.date"
+            />
+            <IndexStat
+                label="Total"
+                :value="currentTotal"
+                :period-start="oldest.date"
+                :period-end="latest.date"
+            />
         </div>
         <div class="relative grid md:grid-cols-3 grid-cols-1">
             <div
