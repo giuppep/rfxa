@@ -118,7 +118,7 @@ watchEffect(async () => {
     <div class="p-4">
         <div class="flex justify-between items-end mb-4">
             <div class="flex flex-col gap-0.5">
-                <span class="font-medium text-slate-700 text-sm">
+                <span class="font-medium text-olive-700 text-sm">
                     Select one index:
                 </span>
                 <nav class="flex gap-2">
@@ -126,8 +126,8 @@ watchEffect(async () => {
                         v-for="index in ECONOMIC_INDICES"
                         :key="index.id"
                         :to="`/indices/${index.id}`"
-                        class="bg-slate-100 rounded-md px-2 py-1 text-slate-500 hover:text-slate-50 hover:bg-slate-400"
-                        exact-active-class="text-slate-50! bg-slate-500"
+                        class="rounded-md px-2 py-1 bg-olive-200 text-olive-700 hover:text-olive-50 hover:bg-olive-400"
+                        exact-active-class="text-olive-50! bg-olive-500"
                     >
                         {{ index.label }}
                     </RouterLink>
@@ -167,7 +167,7 @@ watchEffect(async () => {
         <div class="relative grid md:grid-cols-3 grid-cols-1">
             <div
                 v-if="loading"
-                class="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-xs text-slate-400"
+                class="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-xs text-olive-400"
             >
                 <PhSpinnerGap class="h-8 w-8 animate-spin" />
                 Loading...
@@ -181,8 +181,8 @@ watchEffect(async () => {
                         class="rounded-full px-3 py-1 text-sm"
                         :class="
                             chartSeries === option.value
-                                ? 'bg-slate-500 text-slate-50'
-                                : 'bg-slate-100 text-slate-500 hover:bg-slate-400 hover:text-slate-50'
+                                ? 'bg-olive-500 text-olive-50'
+                                : 'bg-olive-200 text-olive-700 hover:text-olive-50 hover:bg-olive-400'
                         "
                         @click="chartSeries = option.value"
                     >

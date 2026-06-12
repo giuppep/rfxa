@@ -23,7 +23,7 @@ const value = computed({
 
 <template>
     <label class="flex flex-col items-start gap-0.5">
-        <span class="text-sm font-medium text-slate-700"> {{ label }}: </span>
+        <span class="text-sm font-medium text-olive-700"> {{ label }}: </span>
         <input
             v-model="value"
             type="date"
