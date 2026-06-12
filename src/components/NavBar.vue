@@ -4,7 +4,7 @@ const navItems = [{ label: "indices", to: { name: "indices-root" } }]
 
 <template>
     <nav
-        class="flex flex-wrap items-center justify-start bg-olive-200 gap-4 px-4 sm:px-6 py-1 m-1 rounded-lg"
+        class="flex flex-wrap items-center justify-start bg-olive-200 gap-4 px-4 sm:px-6 py-1 m-1 rounded-lg top-1 ring-4 ring-olive-50 sticky z-10"
     >
         <RouterLink to="/" class="text-lg font-bold">rfxa</RouterLink>
         <ul class="flex gap-4">

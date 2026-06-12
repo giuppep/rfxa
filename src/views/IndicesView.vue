@@ -116,7 +116,7 @@ watchEffect(async () => {
 
 <template>
     <div class="p-4">
-        <div class="flex justify-between items-end mb-4">
+        <div class="flex flex-wrap justify-between gap-2 items-end mb-4">
             <div class="flex flex-col gap-0.5">
                 <span class="font-medium text-olive-700 text-sm">
                     Select one index:
@@ -138,7 +138,10 @@ watchEffect(async () => {
                 <DateInput v-model="periodEnd" label="To" />
             </div>
         </div>
-        <div v-if="latest" class="flex gap-4 mb-4">
+        <div
+            v-if="latest"
+            class="grid grid-cols-2 grid-rows-2 md:grid-cols-4 md:grid-rows-1 gap-4 mb-4"
+        >
             <IndexStat
                 label="Current MoM"
                 :value="latest.value"
