@@ -145,31 +145,25 @@ watchEffect(async () => {
 
 <template>
     <div class="p-4">
-        <div class="flex flex-wrap justify-between gap-2 items-end mb-4">
-            <div class="flex flex-col gap-0.5">
-                <span class="font-medium text-olive-700 text-sm">
-                    Select one index:
-                </span>
-                <nav class="flex gap-2">
-                    <RouterLink
-                        v-for="index in ECONOMIC_INDICES"
-                        :key="index.id"
-                        :to="{ name: 'indices', params: { type: index.id } }"
-                        class="rounded-md px-2 py-1 bg-olive-200 text-olive-700 hover:text-olive-50 hover:bg-olive-400"
-                        exact-active-class="text-olive-50! bg-olive-500"
-                    >
-                        {{ index.label }}
-                    </RouterLink>
-                </nav>
-            </div>
-            <div class="flex gap-1">
-                <DateInput v-model="periodStart" label="From" />
-                <DateInput v-model="periodEnd" label="To" />
-            </div>
+        <div class="flex flex-col gap-0.5 mb-4">
+            <span class="font-medium text-olive-700 text-sm">
+                Select one index:
+            </span>
+            <nav class="flex gap-2">
+                <RouterLink
+                    v-for="index in ECONOMIC_INDICES"
+                    :key="index.id"
+                    :to="{ name: 'indices', params: { type: index.id } }"
+                    class="rounded-md px-2 py-1 bg-olive-200 text-olive-700 hover:text-olive-50 hover:bg-olive-400"
+                    exact-active-class="text-olive-50! bg-olive-500"
+                >
+                    {{ index.label }}
+                </RouterLink>
+            </nav>
         </div>
         <div
             v-if="latestAvailable"
-            class="grid grid-cols-2 grid-rows-2 md:grid-cols-4 md:grid-rows-1 gap-4 mb-4"
+            class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4"
         >
             <IndexStat
                 label="Current MoM"
@@ -189,6 +183,12 @@ watchEffect(async () => {
                 :period-start="ytdPeriodStart"
                 :period-end="latestAvailable.date"
             />
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <div class="flex gap-2 rounded-lg bg-white p-4 shadow-sm">
+                <DateInput v-model="periodStart" label="From" />
+                <DateInput v-model="periodEnd" label="To" />
+            </div>
             <IndexStat
                 v-if="latest"
                 label="Total (selected period)"
