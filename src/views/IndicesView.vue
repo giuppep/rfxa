@@ -13,7 +13,7 @@ import {
     computeCumulativeIndexValues,
     computeCumulativeInterest,
 } from "@/utils/finance"
-import { ECONOMIC_INDICES, IndexId } from "@/config/indices"
+import { ECONOMIC_INDICES, IndexConfig, IndexId } from "@/config/indices"
 
 const props = defineProps<{ type: IndexId }>()
 
@@ -27,35 +27,45 @@ const SERIES_OPTIONS: { value: typeof chartSeries.value; label: string }[] = [
     { value: "total", label: "Total" },
 ]
 
-// monthlyIndexValues is sorted descending by date, so the first entry is
-// the most recent month.
-const latest = computed(() => monthlyIndexValues.value[0])
+// Fetched independently of the selected period (always the latest ~24
+// months up to today), so the "Current" stats below stay up to date
+// regardless of the date picker.
+const currentIndexValues = ref<IndexValue[]>([])
+const currentMonthlyValues = computed(() =>
+    computeCumulativeIndexValues(currentIndexValues.value)
+)
 
-// indexValues covers 12 months before periodStart (for the YoY lookback), so
-// it always reaches back to January of latest's year, regardless of the
-// selected period.
+// currentMonthlyValues is sorted descending by date, so the first entry is
+// the most recent month for which data is available.
+const latestAvailable = computed(() => currentMonthlyValues.value[0])
+
+// currentIndexValues reaches back 24 months from today, so it always covers
+// January of latestAvailable's year.
 const currentYtd = computed(() => {
-    if (!latest.value) return 0
+    if (!latestAvailable.value) return 0
 
-    const year = latest.value.date.getFullYear()
+    const year = latestAvailable.value.date.getFullYear()
     return computeCumulativeInterest(
-        indexValues.value.filter((iv) => iv.date.getFullYear() === year)
+        currentIndexValues.value.filter((iv) => iv.date.getFullYear() === year)
     )
 })
 
-// cumulativeLast12Months covers the latest month plus the 11 preceding ones.
+// cumulativeLast12Months covers latestAvailable's month plus the 11
+// preceding ones.
 const yoyPeriodStart = computed(() => {
-    const date = new Date(latest.value?.date ?? 0)
+    const date = new Date(latestAvailable.value?.date ?? 0)
     date.setMonth(date.getMonth() - 11)
     return date
 })
 
 const ytdPeriodStart = computed(
-    () => new Date(latest.value?.date.getFullYear() ?? 0, 0, 1)
+    () => new Date(latestAvailable.value?.date.getFullYear() ?? 0, 0, 1)
 )
 
-// monthlyIndexValues is sorted descending by date, so the last entry is the
-// oldest month in the displayed range.
+// monthlyIndexValues is sorted descending by date, so the first/last entries
+// are the latest/oldest months in the selected period - used for the "Total"
+// stat's period range.
+const latest = computed(() => monthlyIndexValues.value[0])
 const oldest = computed(
     () => monthlyIndexValues.value[monthlyIndexValues.value.length - 1]
 )
@@ -85,6 +95,15 @@ const periodStart = ref(new Date(periodEnd.value))
 periodStart.value.setMonth(periodStart.value.getMonth() - 12)
 periodStart.value.setDate(1)
 
+const fetchIndexValues = (
+    index: IndexConfig,
+    periodStart: Date,
+    periodEnd: Date
+) => {
+    const request = index.provider === "ipea" ? ipeaRequest : bacenRequest
+    return cachedIndexRequest(request, index, periodStart, periodEnd)
+}
+
 watchEffect(async () => {
     const index = ECONOMIC_INDICES.find((index) => index.id === props.type)
     if (!index) return
@@ -97,20 +116,30 @@ watchEffect(async () => {
     fetchPeriodStart.setMonth(fetchPeriodStart.getMonth() - 12)
 
     loading.value = true
-    const request = index.provider === "ipea" ? ipeaRequest : bacenRequest
-    indexValues.value = await cachedIndexRequest(
-        request,
+    indexValues.value = await fetchIndexValues(
         index,
         fetchPeriodStart,
         periodEnd.value
     )
     loading.value = false
 
-    // Compute cumulative values over the full (24-month) series, then trim
-    // back down to the displayed range (12 months) for the table/chart.
     monthlyIndexValues.value = computeCumulativeIndexValues(
         indexValues.value
     ).filter((indexValue) => indexValue.date >= periodStart.value)
+})
+
+// Independent of periodStart/periodEnd: always fetches the latest ~24
+// months up to today, so the "Current" stats stay current regardless of the
+// selected period.
+watchEffect(async () => {
+    const index = ECONOMIC_INDICES.find((index) => index.id === props.type)
+    if (!index) return
+
+    const now = new Date()
+    const fetchStart = new Date(now)
+    fetchStart.setMonth(fetchStart.getMonth() - 24)
+
+    currentIndexValues.value = await fetchIndexValues(index, fetchStart, now)
 })
 </script>
 
@@ -139,29 +168,30 @@ watchEffect(async () => {
             </div>
         </div>
         <div
-            v-if="latest"
+            v-if="latestAvailable"
             class="grid grid-cols-2 grid-rows-2 md:grid-cols-4 md:grid-rows-1 gap-4 mb-4"
         >
             <IndexStat
                 label="Current MoM"
-                :value="latest.value"
-                :period-start="latest.date"
-                :period-end="latest.date"
+                :value="latestAvailable.value"
+                :period-start="latestAvailable.date"
+                :period-end="latestAvailable.date"
             />
             <IndexStat
                 label="Current YoY"
-                :value="latest.cumulativeLast12Months"
+                :value="latestAvailable.cumulativeLast12Months"
                 :period-start="yoyPeriodStart"
-                :period-end="latest.date"
+                :period-end="latestAvailable.date"
             />
             <IndexStat
                 label="Current YTD"
                 :value="currentYtd"
                 :period-start="ytdPeriodStart"
-                :period-end="latest.date"
+                :period-end="latestAvailable.date"
             />
             <IndexStat
-                label="Total"
+                v-if="latest"
+                label="Total (selected period)"
                 :value="currentTotal"
                 :period-start="oldest.date"
                 :period-end="latest.date"
