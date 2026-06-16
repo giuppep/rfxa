@@ -1,0 +1,82 @@
+@layer components {
+    /* Note: tooltip is not shown when data-tooltip is an empty string */
+    [data-tooltip]:not([data-tooltip=""]) {
+        @apply relative overflow-visible;
+        @apply after:invisible before:invisible hover:after:visible hover:before:visible;
+    }
+
+    [data-tooltip]::before,
+    [data-tooltip]::after {
+        @apply absolute pointer-events-none z-50 shadow-sm;
+    }
+
+    [data-tooltip]::before {
+        @apply px-2 py-2 rounded-lg w-max bg-gray-900;
+        @apply text-xs text-white not-italic content-[attr(data-tooltip)];
+        @apply max-w-48 text-wrap;
+    }
+
+    [data-tooltip]::after {
+        @apply border-[5px] border-transparent content-[""];
+    }
+
+    /* Top (default) */
+    [data-tooltip]:not([data-tooltip-position])::before,
+    [data-tooltip]:not([data-tooltip-position])::after,
+    [data-tooltip-position="top"]::before,
+    [data-tooltip-position="top"]::after {
+        @apply left-1/2 -translate-x-1/2 -top-[5px];
+    }
+
+    [data-tooltip]:not([data-tooltip-position])::before,
+    [data-tooltip-position="top"]::before {
+        @apply -translate-y-full;
+    }
+
+    [data-tooltip]:not([data-tooltip-position])::after,
+    [data-tooltip-position="top"]::after {
+        @apply border-t-gray-900;
+    }
+
+    /* Right */
+    [data-tooltip-position="right"]::before,
+    [data-tooltip-position="right"]::after {
+        @apply -right-[5px] top-1/2 -translate-y-1/2;
+    }
+
+    [data-tooltip-position="right"]::before {
+        @apply translate-x-full;
+    }
+
+    [data-tooltip-position="right"]::after {
+        @apply border-r-gray-900;
+    }
+
+    /* Left */
+    [data-tooltip-position="left"]::before,
+    [data-tooltip-position="left"]::after {
+        @apply -left-[5px] top-1/2 -translate-y-1/2;
+    }
+
+    [data-tooltip-position="left"]::before {
+        @apply -translate-x-full;
+    }
+
+    [data-tooltip-position="left"]::after {
+        @apply border-l-gray-900;
+    }
+
+    /* Bottom */
+    [data-tooltip-position="bottom"]::before,
+    [data-tooltip-position="bottom"]::after {
+        @apply left-1/2 -translate-x-1/2 -bottom-[5px];
+    }
+
+    [data-tooltip-position="bottom"]::before {
+        @apply translate-y-full;
+    }
+
+    [data-tooltip-position="bottom"]::after {
+        @apply border-b-gray-900;
+    }
+}
