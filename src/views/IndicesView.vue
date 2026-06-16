@@ -70,6 +70,22 @@ const oldest = computed(
     () => monthlyIndexValues.value[monthlyIndexValues.value.length - 1]
 )
 
+// The months with the highest/lowest MoM value in the selected period.
+const bestMonth = computed(() =>
+    monthlyIndexValues.value.reduce<CumulativeIndexValue | undefined>(
+        (best, current) =>
+            !best || current.value > best.value ? current : best,
+        undefined
+    )
+)
+const worstMonth = computed(() =>
+    monthlyIndexValues.value.reduce<CumulativeIndexValue | undefined>(
+        (worst, current) =>
+            !worst || current.value < worst.value ? current : worst,
+        undefined
+    )
+)
+
 // Cumulative growth of 1 unit invested at periodStart, evaluated at each
 // month in the displayed range. monthlyIndexValues is sorted descending, so
 // it's reversed to accumulate from the oldest month, then reversed back.
@@ -87,6 +103,14 @@ const cumulativeTotalSeries = computed<IndexValue[]>(() => {
 // The first entry of cumulativeTotalSeries is the cumulative growth over the
 // whole displayed range.
 const currentTotal = computed(() => cumulativeTotalSeries.value[0]?.value ?? 0)
+
+// Converts the selected period's cumulative return to an annualized rate, so
+// periods of different lengths can be compared on equal footing.
+const annualizedTotal = computed(() => {
+    const months = monthlyIndexValues.value.length
+    if (months === 0) return 0
+    return Math.pow(1 + currentTotal.value, 12 / months) - 1
+})
 
 // Default to the trailing 12 months, from the 1st of the month 12 months
 // ago up to today. The user can adjust this range via the date inputs.
@@ -184,17 +208,39 @@ watchEffect(async () => {
                 :period-end="latestAvailable.date"
             />
         </div>
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-            <div class="flex gap-2 rounded-lg bg-white p-4 shadow-sm">
-                <DateInput v-model="periodStart" label="From" />
-                <DateInput v-model="periodEnd" label="To" />
-            </div>
+        <div class="flex gap-2 rounded-lg bg-white p-4 shadow-sm w-fit mb-4">
+            <DateInput v-model="periodStart" label="From" />
+            <DateInput v-model="periodEnd" label="To" />
+        </div>
+        <div
+            v-if="latest"
+            class="grid grid-cols-2 grid-rows-2 md:grid-cols-4 md:grid-rows-1 gap-4 mb-4"
+        >
             <IndexStat
-                v-if="latest"
                 label="Total (selected period)"
                 :value="currentTotal"
                 :period-start="oldest.date"
                 :period-end="latest.date"
+            />
+            <IndexStat
+                label="Annualized (selected period)"
+                :value="annualizedTotal"
+                :period-start="oldest.date"
+                :period-end="latest.date"
+            />
+            <IndexStat
+                v-if="bestMonth"
+                label="Best month (selected period)"
+                :value="bestMonth.value"
+                :period-start="bestMonth.date"
+                :period-end="bestMonth.date"
+            />
+            <IndexStat
+                v-if="worstMonth"
+                label="Worst month (selected period)"
+                :value="worstMonth.value"
+                :period-start="worstMonth.date"
+                :period-end="worstMonth.date"
             />
         </div>
         <div class="relative grid md:grid-cols-3 grid-cols-1">
