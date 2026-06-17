@@ -191,18 +191,21 @@ watchEffect(async () => {
         >
             <IndexStat
                 label="Current MoM"
+                description="Month-on-month return for the latest available month"
                 :value="latestAvailable.value"
                 :period-start="latestAvailable.date"
                 :period-end="latestAvailable.date"
             />
             <IndexStat
                 label="Current YoY"
+                description="Cumulative compounded return over the last 12 months"
                 :value="latestAvailable.cumulativeLast12Months"
                 :period-start="yoyPeriodStart"
                 :period-end="latestAvailable.date"
             />
             <IndexStat
                 label="Current YTD"
+                description="Cumulative compounded return since January 1st of the current year"
                 :value="currentYtd"
                 :period-start="ytdPeriodStart"
                 :period-end="latestAvailable.date"
@@ -218,12 +221,14 @@ watchEffect(async () => {
         >
             <IndexStat
                 label="Total (selected period)"
+                description="Cumulative compounded return over the selected period"
                 :value="currentTotal"
                 :period-start="oldest.date"
                 :period-end="latest.date"
             />
             <IndexStat
                 label="Annualized (selected period)"
+                description="What the selected period's return would be if sustained for 12 months"
                 :value="annualizedTotal"
                 :period-start="oldest.date"
                 :period-end="latest.date"
@@ -231,6 +236,7 @@ watchEffect(async () => {
             <IndexStat
                 v-if="bestMonth"
                 label="Best month (selected period)"
+                description="Month with the highest month-on-month return in the selected period"
                 :value="bestMonth.value"
                 :period-start="bestMonth.date"
                 :period-end="bestMonth.date"
@@ -238,6 +244,7 @@ watchEffect(async () => {
             <IndexStat
                 v-if="worstMonth"
                 label="Worst month (selected period)"
+                description="Month with the lowest month-on-month return in the selected period"
                 :value="worstMonth.value"
                 :period-start="worstMonth.date"
                 :period-end="worstMonth.date"
