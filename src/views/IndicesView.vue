@@ -188,7 +188,7 @@ watchEffect(async () => {
         </div>
         <div
             v-if="latestAvailable"
-            class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4"
+            class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4"
         >
             <h3 class="col-span-full">Latest values</h3>
             <IndexStat
