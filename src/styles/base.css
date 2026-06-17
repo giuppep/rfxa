@@ -22,10 +22,6 @@
         @apply font-normal text-base text-olive-900 bg-olive-50;
     }
 
-    h1 {
-        @apply text-5xl font-black;
-    }
-
     table {
         @apply w-full border-collapse text-sm;
     }
