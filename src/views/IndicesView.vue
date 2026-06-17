@@ -188,6 +188,9 @@ watchEffect(async () => {
                     {{ index.label }}
                 </RouterLink>
             </nav>
+            <p class="text-sm text-olive-600 mt-1">
+                {{ t(`index.${props.type}.description`) }}
+            </p>
         </div>
         <div
             v-if="latestAvailable"
