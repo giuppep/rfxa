@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n"
-import type { Locale } from "@/i18n"
+import { i18n } from "@/i18n"
 
 const { t, locale } = useI18n()
 
-const toggleLocale = () => {
-    locale.value = locale.value === "en-GB" ? "pt-BR" : "en-GB"
-    localStorage.setItem("locale", locale.value)
+const availableLocales = i18n.global.availableLocales
+
+const setLocale = (code: string) => {
+    locale.value = code
+    localStorage.setItem("locale", code)
 }
 </script>
 
@@ -26,11 +28,22 @@ const toggleLocale = () => {
                 </RouterLink>
             </li>
         </ul>
-        <button
-            class="ml-auto text-sm font-medium text-olive-600 hover:text-olive-900 px-2 py-0.5 rounded-md hover:bg-olive-300"
-            @click="toggleLocale"
+        <div
+            class="ml-auto flex items-center rounded-full bg-olive-300 p-0.5 text-xs font-medium"
         >
-            {{ (locale as Locale) === "en-GB" ? "PT" : "EN" }}
-        </button>
+            <button
+                v-for="code in availableLocales"
+                :key="code"
+                class="rounded-full px-2 py-0.5 transition-colors"
+                :class="
+                    locale === code
+                        ? 'bg-olive-500 text-olive-50'
+                        : 'text-olive-600'
+                "
+                @click="setLocale(code)"
+            >
+                {{ code.split("-")[0].toUpperCase() }}
+            </button>
+        </div>
     </nav>
 </template>
