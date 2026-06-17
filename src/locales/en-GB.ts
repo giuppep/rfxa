@@ -3,6 +3,7 @@ export default {
         indices: "Indices",
         exchange: "Exchange",
         menu: "Open navigation menu",
+        calculator: "Calculator",
     },
     home: {
         tagline:
@@ -108,5 +109,8 @@ export default {
         chartLabel: "USD/BRL {type}",
         loading: "Loading exchange rate...",
         unavailable: "The exchange rate is unavailable right now.",
+    },
+    calculator: {
+        pageTitle: "Returns calculator",
     },
 }

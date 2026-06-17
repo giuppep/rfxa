@@ -3,6 +3,7 @@ export default {
         indices: "Índices",
         exchange: "Câmbio",
         menu: "Abrir menu de navegação",
+        calculator: "Calculadora",
     },
     home: {
         tagline:
@@ -107,5 +108,8 @@ export default {
         chartLabel: "USD/BRL {type}",
         loading: "Carregando cotação...",
         unavailable: "A cotação está indisponível no momento.",
+    },
+    calculator: {
+        pageTitle: "Calculadora de retornos",
     },
 }
