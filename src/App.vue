@@ -4,5 +4,7 @@ import NavBar from "./components/NavBar.vue"
 
 <template>
     <NavBar class="" />
-    <router-view class="px-4 md:px-8" />
+    <div class="overflow-x-clip">
+        <router-view class="px-4 md:px-8" />
+    </div>
 </template>

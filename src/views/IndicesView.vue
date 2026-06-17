@@ -211,9 +211,14 @@ watchEffect(async () => {
                 :period-end="latestAvailable.date"
             />
         </div>
-        <div class="flex gap-2 rounded-lg bg-white p-4 shadow-sm w-fit mb-4">
-            <DateInput v-model="periodStart" label="From" />
-            <DateInput v-model="periodEnd" label="To" />
+        <div
+            class="flex items-end justify-between border-t border-olive-200 mt-2 pt-4 mb-4"
+        >
+            <h3 class="font-medium text-olive-700 text-sm">Selected period</h3>
+            <div class="flex gap-2">
+                <DateInput v-model="periodStart" label="From" />
+                <DateInput v-model="periodEnd" label="To" />
+            </div>
         </div>
         <div
             v-if="latest"
