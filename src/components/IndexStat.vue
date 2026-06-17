@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import { PhInfo } from "@phosphor-icons/vue"
+import { useI18n } from "vue-i18n"
 
 const props = defineProps<{
     label: string
@@ -10,8 +11,10 @@ const props = defineProps<{
     description?: string
 }>()
 
+const { locale } = useI18n()
+
 const formatMonth = (date: Date) =>
-    Intl.DateTimeFormat("en-GB", {
+    Intl.DateTimeFormat(locale.value, {
         month: "short",
         year: "numeric",
     }).format(date)

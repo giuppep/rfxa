@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from "vue"
+import { useI18n } from "vue-i18n"
 import { PhSpinnerGap } from "@phosphor-icons/vue"
 import { IndexValue, CumulativeIndexValue } from "@/models/finance"
 import { bacenRequest } from "@/utils/bacen"
@@ -15,16 +16,18 @@ import {
 } from "@/utils/finance"
 import { ECONOMIC_INDICES, IndexConfig, IndexId } from "@/config/indices"
 
+const { t } = useI18n()
+
 const props = defineProps<{ type: IndexId }>()
 
 const indexValues = ref<IndexValue[]>([])
 const monthlyIndexValues = ref<CumulativeIndexValue[]>([])
 const loading = ref(false)
 const chartSeries = ref<"mom" | "yoy" | "total">("mom")
-const SERIES_OPTIONS: { value: typeof chartSeries.value; label: string }[] = [
-    { value: "mom", label: "MoM" },
-    { value: "yoy", label: "YoY" },
-    { value: "total", label: "Total" },
+const SERIES_OPTIONS: { value: typeof chartSeries.value }[] = [
+    { value: "mom" },
+    { value: "yoy" },
+    { value: "total" },
 ]
 
 // Fetched independently of the selected period (always the latest ~24
@@ -169,10 +172,10 @@ watchEffect(async () => {
 
 <template>
     <div class="p-4">
-        <h2>Brazilian economic indices</h2>
+        <h2>{{ t("indices.pageTitle") }}</h2>
         <div class="flex flex-col gap-0.5 mb-4">
             <span class="font-medium text-olive-700 text-sm">
-                Select one index:
+                {{ t("indices.selectIndex") }}
             </span>
             <nav class="flex gap-2">
                 <RouterLink
@@ -190,24 +193,24 @@ watchEffect(async () => {
             v-if="latestAvailable"
             class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4"
         >
-            <h3 class="col-span-full">Latest values</h3>
+            <h3 class="col-span-full">{{ t("indices.latestValues") }}</h3>
             <IndexStat
-                label="Current MoM"
-                description="Month-on-month return for the latest available month"
+                :label="t('indices.stats.currentMom.label')"
+                :description="t('indices.stats.currentMom.description')"
                 :value="latestAvailable.value"
                 :period-start="latestAvailable.date"
                 :period-end="latestAvailable.date"
             />
             <IndexStat
-                label="Current YoY"
-                description="Cumulative compounded return over the last 12 months"
+                :label="t('indices.stats.currentYoy.label')"
+                :description="t('indices.stats.currentYoy.description')"
                 :value="latestAvailable.cumulativeLast12Months"
                 :period-start="yoyPeriodStart"
                 :period-end="latestAvailable.date"
             />
             <IndexStat
-                label="Current YTD"
-                description="Cumulative compounded return since January 1st of the current year"
+                :label="t('indices.stats.currentYtd.label')"
+                :description="t('indices.stats.currentYtd.description')"
                 :value="currentYtd"
                 :period-start="ytdPeriodStart"
                 :period-end="latestAvailable.date"
@@ -216,10 +219,10 @@ watchEffect(async () => {
         <div
             class="flex items-end justify-between border-t border-olive-200 mt-2 pt-4 mb-4"
         >
-            <h3>Period analysis</h3>
+            <h3>{{ t("indices.periodAnalysis") }}</h3>
             <div class="flex gap-2">
-                <DateInput v-model="periodStart" label="From" />
-                <DateInput v-model="periodEnd" label="To" />
+                <DateInput v-model="periodStart" :label="t('indices.from')" />
+                <DateInput v-model="periodEnd" :label="t('indices.to')" />
             </div>
         </div>
         <div
@@ -227,31 +230,31 @@ watchEffect(async () => {
             class="grid grid-cols-2 grid-rows-2 md:grid-cols-4 md:grid-rows-1 gap-4 mb-4"
         >
             <IndexStat
-                label="Total (selected period)"
-                description="Cumulative compounded return over the selected period"
+                :label="t('indices.stats.total.label')"
+                :description="t('indices.stats.total.description')"
                 :value="currentTotal"
                 :period-start="oldest.date"
                 :period-end="latest.date"
             />
             <IndexStat
-                label="Annualized (selected period)"
-                description="What the selected period's return would be if sustained for 12 months"
+                :label="t('indices.stats.annualized.label')"
+                :description="t('indices.stats.annualized.description')"
                 :value="annualizedTotal"
                 :period-start="oldest.date"
                 :period-end="latest.date"
             />
             <IndexStat
                 v-if="bestMonth"
-                label="Best month (selected period)"
-                description="Month with the highest month-on-month return in the selected period"
+                :label="t('indices.stats.bestMonth.label')"
+                :description="t('indices.stats.bestMonth.description')"
                 :value="bestMonth.value"
                 :period-start="bestMonth.date"
                 :period-end="bestMonth.date"
             />
             <IndexStat
                 v-if="worstMonth"
-                label="Worst month (selected period)"
-                description="Month with the lowest month-on-month return in the selected period"
+                :label="t('indices.stats.worstMonth.label')"
+                :description="t('indices.stats.worstMonth.description')"
                 :value="worstMonth.value"
                 :period-start="worstMonth.date"
                 :period-end="worstMonth.date"
@@ -263,7 +266,7 @@ watchEffect(async () => {
                 class="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-xs text-olive-400"
             >
                 <PhSpinnerGap class="h-8 w-8 animate-spin" />
-                Loading...
+                {{ t("indices.loading") }}
             </div>
             <div class="col-span-2">
                 <div class="m-4 flex gap-2">
@@ -279,7 +282,7 @@ watchEffect(async () => {
                         "
                         @click="chartSeries = option.value"
                     >
-                        {{ option.label }}
+                        {{ t(`indices.series.${option.value}`) }}
                     </button>
                 </div>
                 <IndexLineChart
