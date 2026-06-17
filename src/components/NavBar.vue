@@ -34,7 +34,7 @@ const setLocale = (code: string) => {
             <button
                 v-for="code in availableLocales"
                 :key="code"
-                class="rounded-full px-2 py-0.5 transition-colors"
+                class="rounded-full px-2 py-0.5 transition-colors cursor-pointer"
                 :class="
                     locale === code
                         ? 'bg-olive-500 text-olive-50'
