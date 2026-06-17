@@ -1,13 +1,15 @@
 <script setup lang="ts">
+import { useI18n } from "vue-i18n"
 import { ECONOMIC_INDICES } from "@/config/indices"
+
+const { t } = useI18n()
 </script>
 
 <template>
     <div class="py-8">
         <h1>rfxa</h1>
         <p class="mt-2 max-w-2xl text-olive-700">
-            Track Brazilian economic indices with month-on-month, year-on-year
-            and cumulative changes over any period you choose.
+            {{ t("home.tagline") }}
         </p>
         <div class="mt-8 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
             <RouterLink
@@ -20,7 +22,7 @@ import { ECONOMIC_INDICES } from "@/config/indices"
                     {{ index.label }}
                 </div>
                 <div class="mt-1 text-sm text-olive-600">
-                    {{ index.description }}
+                    {{ t(`index.${index.id}.description`) }}
                 </div>
             </RouterLink>
         </div>
