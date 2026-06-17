@@ -169,6 +169,7 @@ watchEffect(async () => {
 
 <template>
     <div class="p-4">
+        <h2>Brazilian economic indices</h2>
         <div class="flex flex-col gap-0.5 mb-4">
             <span class="font-medium text-olive-700 text-sm">
                 Select one index:
@@ -189,6 +190,7 @@ watchEffect(async () => {
             v-if="latestAvailable"
             class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4"
         >
+            <h3 class="col-span-full">Latest values</h3>
             <IndexStat
                 label="Current MoM"
                 description="Month-on-month return for the latest available month"
@@ -214,7 +216,7 @@ watchEffect(async () => {
         <div
             class="flex items-end justify-between border-t border-olive-200 mt-2 pt-4 mb-4"
         >
-            <h3 class="font-medium text-olive-700 text-sm">Selected period</h3>
+            <h3>Period analysis</h3>
             <div class="flex gap-2">
                 <DateInput v-model="periodStart" label="From" />
                 <DateInput v-model="periodEnd" label="To" />
