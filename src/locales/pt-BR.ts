@@ -111,5 +111,23 @@ export default {
     },
     calculator: {
         pageTitle: "Calculadora de retornos",
+        investedAmount: "Valor investido",
+        index: "Índice",
+        fixedRate: "Taxa fixa",
+        period: "Período",
+        from: "De",
+        to: "Até",
+        modifierType: {
+            percentage: "% do índice",
+            spread: "Índice + % a.a.",
+        },
+        results: {
+            finalValue: "Valor final",
+            invested: "Investido: {amount}",
+            totalReturn: "Retorno total",
+            months: "{n} meses",
+            annualized: "Retorno anualizado",
+            perAnnum: "ao ano",
+        },
     },
 }

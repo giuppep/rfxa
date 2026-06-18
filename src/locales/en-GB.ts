@@ -112,5 +112,23 @@ export default {
     },
     calculator: {
         pageTitle: "Returns calculator",
+        investedAmount: "Invested amount",
+        index: "Index",
+        fixedRate: "Fixed rate",
+        period: "Period",
+        from: "From",
+        to: "To",
+        modifierType: {
+            percentage: "% of index",
+            spread: "Index + % p.a.",
+        },
+        results: {
+            finalValue: "Final value",
+            invested: "Invested: {amount}",
+            totalReturn: "Total return",
+            months: "{n} months",
+            annualized: "Annualized return",
+            perAnnum: "per annum",
+        },
     },
 }
