@@ -53,22 +53,22 @@ export default {
                     "Cumulative compounded return since January 1st of the current year",
             },
             total: {
-                label: "Total (selected period)",
+                label: "Total",
                 description:
                     "Cumulative compounded return over the selected period",
             },
             annualized: {
-                label: "Annualized (selected period)",
+                label: "Annualized",
                 description:
                     "What the selected period's return would be if sustained for 12 months",
             },
             bestMonth: {
-                label: "Best month (selected period)",
+                label: "Best month",
                 description:
                     "Month with the highest month-on-month return in the selected period",
             },
             worstMonth: {
-                label: "Worst month (selected period)",
+                label: "Worst month",
                 description:
                     "Month with the lowest month-on-month return in the selected period",
             },
