@@ -52,22 +52,22 @@ export default {
                     "Retorno acumulado desde 1º de janeiro do ano corrente",
             },
             total: {
-                label: "Total (período selecionado)",
+                label: "Total",
                 description:
                     "Retorno acumulado composto no período selecionado",
             },
             annualized: {
-                label: "Anualizado (período selecionado)",
+                label: "Anualizado",
                 description:
                     "O retorno do período selecionado projetado para 12 meses",
             },
             bestMonth: {
-                label: "Melhor mês (período selecionado)",
+                label: "Melhor mês",
                 description:
                     "Mês com a maior variação mensal no período selecionado",
             },
             worstMonth: {
-                label: "Pior mês (período selecionado)",
+                label: "Pior mês",
                 description:
                     "Mês com a menor variação mensal no período selecionado",
             },
