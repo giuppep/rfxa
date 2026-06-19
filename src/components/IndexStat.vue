@@ -32,10 +32,16 @@ const period = computed(() => {
             {{ label }}
             <span
                 v-if="description"
-                class="cursor-help text-olive-400"
-                :data-tooltip="description"
+                class="inline-flex text-olive-400"
             >
-                <PhInfo class="h-4 w-4 shrink-0" />
+                <button
+                    v-tooltip="description"
+                    type="button"
+                    class="inline-flex h-5 w-5 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-olive-400 focus-visible:ring-offset-2"
+                >
+                    <PhInfo class="h-4 w-4 shrink-0" />
+                    <span class="sr-only">{{ description }}</span>
+                </button>
             </span>
         </div>
         <div class="slashed-zero font-mono text-2xl font-semibold">
