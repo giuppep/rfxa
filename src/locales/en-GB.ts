@@ -6,6 +6,10 @@ export default {
         tagline:
             "Track Brazilian economic indices with month-on-month, year-on-year and cumulative changes over any period you choose.",
     },
+    notFound: {
+        message: "This page doesn't exist.",
+        backHome: "Back to home",
+    },
     index: {
         cdi: {
             description:

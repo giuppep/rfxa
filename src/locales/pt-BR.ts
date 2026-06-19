@@ -6,6 +6,10 @@ export default {
         tagline:
             "Acompanhe os principais índices econômicos brasileiros com variações mensais, anuais e acumuladas em qualquer período.",
     },
+    notFound: {
+        message: "Esta página não existe.",
+        backHome: "Voltar para a página inicial",
+    },
     index: {
         cdi: {
             description:
