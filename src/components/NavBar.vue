@@ -28,6 +28,15 @@ const setLocale = (code: string) => {
                     {{ t("nav.indices") }}
                 </RouterLink>
             </li>
+            <li>
+                <RouterLink
+                    :to="{ name: 'exchange-usd-brl' }"
+                    class="text-olive-700 hover:text-olive-100 hover:bg-olive-400 px-2 py-0.5 rounded-md"
+                    active-class="bg-olive-500 text-olive-50!"
+                >
+                    {{ t("nav.exchange") }}
+                </RouterLink>
+            </li>
         </ul>
 
         <div
