@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n"
 import { i18n } from "@/i18n"
+import { PhGithubLogo } from "@phosphor-icons/vue"
 
 const { t, locale } = useI18n()
 
@@ -28,6 +29,7 @@ const setLocale = (code: string) => {
                 </RouterLink>
             </li>
         </ul>
+
         <div
             class="ml-auto flex items-center rounded-full bg-olive-300 p-0.5 text-xs font-medium"
         >
@@ -45,5 +47,12 @@ const setLocale = (code: string) => {
                 {{ code.split("-")[0].toUpperCase() }}
             </button>
         </div>
+        <a href="https://github.com/giuppep/rfxa" target="_blank">
+            <PhGithubLogo
+                weight="fill"
+                size="18px"
+                class="hover:text-olive-500 text-olive-600"
+            />
+        </a>
     </nav>
 </template>
