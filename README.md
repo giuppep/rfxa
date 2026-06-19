@@ -35,7 +35,3 @@ The app is a static site (no server/API routes) and is deployed to
 
 - Build command: `npm run build`
 - Build output directory: `dist`
-
-`public/_redirects` redirects all paths to `index.html` so that
-`vue-router`'s history-mode routes (e.g. `/indices/cdi`) work on direct
-navigation and page refresh.
