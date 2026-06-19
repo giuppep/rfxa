@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from "vue"
 import { useI18n } from "vue-i18n"
+import { useRouter } from "vue-router"
 import { PhSpinnerGap } from "@phosphor-icons/vue"
 import { IndexValue, CumulativeIndexValue } from "@/models/finance"
 import { bacenRequest } from "@/utils/bacen"
@@ -8,6 +9,7 @@ import { ipeaRequest } from "@/utils/ipea"
 import { cachedIndexRequest } from "@/utils/cache"
 import DateInput from "@/components/DateInput.vue"
 import IndexLineChart from "@/components/IndexLineChart.vue"
+import IndexSelector from "@/components/IndexSelector.vue"
 import IndexStat from "@/components/IndexStat.vue"
 import IndexTable from "@/components/IndexTable.vue"
 import {
@@ -17,8 +19,14 @@ import {
 import { ECONOMIC_INDICES, IndexConfig, IndexId } from "@/config/indices"
 
 const { t } = useI18n()
+const router = useRouter()
 
-const props = defineProps<{ type: IndexId }>()
+const props = defineProps<{ indexId: IndexId }>()
+
+const selectedIndex = computed({
+    get: () => props.indexId,
+    set: (id) => router.push({ name: "indices", params: { indexId: id } }),
+})
 
 const indexValues = ref<IndexValue[]>([])
 const monthlyIndexValues = ref<CumulativeIndexValue[]>([])
@@ -132,7 +140,7 @@ const fetchIndexValues = (
 }
 
 watchEffect(async () => {
-    const index = ECONOMIC_INDICES.find((index) => index.id === props.type)
+    const index = ECONOMIC_INDICES.find((index) => index.id === props.indexId)
     if (!index) return
 
     // computeCumulativeIndexValues looks back up to 12 months from each
@@ -159,7 +167,7 @@ watchEffect(async () => {
 // months up to today, so the "Current" stats stay current regardless of the
 // selected period.
 watchEffect(async () => {
-    const index = ECONOMIC_INDICES.find((index) => index.id === props.type)
+    const index = ECONOMIC_INDICES.find((index) => index.id === props.indexId)
     if (!index) return
 
     const now = new Date()
@@ -177,19 +185,9 @@ watchEffect(async () => {
             <span class="font-medium text-olive-700 text-sm">
                 {{ t("indices.selectIndex") }}
             </span>
-            <nav class="flex gap-2">
-                <RouterLink
-                    v-for="index in ECONOMIC_INDICES"
-                    :key="index.id"
-                    :to="{ name: 'indices', params: { type: index.id } }"
-                    class="rounded-md px-2 py-1 bg-olive-200 text-olive-700 hover:text-olive-50 hover:bg-olive-400"
-                    exact-active-class="text-olive-50! bg-olive-500"
-                >
-                    {{ index.label }}
-                </RouterLink>
-            </nav>
+            <IndexSelector v-model="selectedIndex" />
             <p class="text-sm text-olive-600 mt-1">
-                {{ t(`index.${props.type}.description`) }}
+                {{ t(`index.${props.indexId}.description`) }}
             </p>
         </div>
         <div

@@ -33,7 +33,7 @@ onMounted(async () => {
             <RouterLink
                 v-for="index in ECONOMIC_INDICES"
                 :key="index.id"
-                :to="{ name: 'indices', params: { type: index.id } }"
+                :to="{ name: 'indices', params: { indexId: index.id } }"
                 class="rounded-lg bg-olive-100 p-4 shadow-xs hover:bg-olive-200"
             >
                 <div class="text-lg font-semibold text-olive-800">

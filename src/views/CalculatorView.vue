@@ -10,6 +10,7 @@ import { computeCumulativeInterest } from "@/utils/finance"
 import { ECONOMIC_INDICES, IndexId } from "@/config/indices"
 import DateInput from "@/components/DateInput.vue"
 import IndexLineChart from "@/components/IndexLineChart.vue"
+import IndexSelector from "@/components/IndexSelector.vue"
 
 const { t, locale } = useI18n()
 
@@ -193,34 +194,7 @@ const formatCurrency = (value: number) =>
                 <span class="text-sm font-medium text-olive-700">
                     {{ t("calculator.index") }}
                 </span>
-                <div class="flex flex-wrap gap-1.5">
-                    <button
-                        v-for="index in ECONOMIC_INDICES"
-                        :key="index.id"
-                        type="button"
-                        class="rounded-md px-2 py-0.5 text-sm"
-                        :class="
-                            indexSelection === index.id
-                                ? 'bg-olive-500 text-olive-50'
-                                : 'bg-olive-200 text-olive-700 hover:bg-olive-400 hover:text-olive-50'
-                        "
-                        @click="indexSelection = index.id"
-                    >
-                        {{ index.label }}
-                    </button>
-                    <button
-                        type="button"
-                        class="rounded-md px-2 py-0.5 text-sm"
-                        :class="
-                            indexSelection === 'fixed'
-                                ? 'bg-olive-500 text-olive-50'
-                                : 'bg-olive-200 text-olive-700 hover:bg-olive-400 hover:text-olive-50'
-                        "
-                        @click="indexSelection = 'fixed'"
-                    >
-                        {{ t("calculator.fixedRate") }}
-                    </button>
-                </div>
+                <IndexSelector v-model="indexSelection" show-fixed />
 
                 <div
                     v-if="isIndexBased"

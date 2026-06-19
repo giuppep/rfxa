@@ -38,4 +38,8 @@
     td {
         @apply px-3 py-2;
     }
+
+    button {
+        @apply cursor-pointer;
+    }
 }
