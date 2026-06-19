@@ -33,5 +33,6 @@ data flow.
 The app is a static site (no server/API routes) and is deployed to
 [Cloudflare Pages](https://pages.cloudflare.com/):
 
+- Production URL: <https://rfxa.giuppep.dev>
 - Build command: `npm run build`
 - Build output directory: `dist`
