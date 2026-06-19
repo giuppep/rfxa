@@ -1,5 +1,6 @@
 import { IndexValue } from "@/models/finance"
 import { IndexConfig } from "@/config/indices"
+import { formatDate } from "@/utils/formatting"
 
 interface SerializedIndexValue {
     date: string
@@ -12,17 +13,9 @@ type IndexRequest = (
     periodEnd?: Date
 ) => Promise<IndexValue[]>
 
-const formatCacheDate = (date?: Date) => {
-    if (!date) return ""
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, "0")
-    const day = String(date.getDate()).padStart(2, "0")
-    return `${year}-${month}-${day}`
-}
-
 const cacheKey = (index: IndexConfig, periodStart?: Date, periodEnd?: Date) =>
     `index-values:${index.id}:${index.provider}:` +
-    `${formatCacheDate(periodStart)}:${formatCacheDate(periodEnd)}`
+    `${formatDate(periodStart)}:${formatDate(periodEnd)}`
 
 /** Wraps an index *Request helper with a sessionStorage cache keyed by
  *  index, provider and time span, so the same data isn't refetched on

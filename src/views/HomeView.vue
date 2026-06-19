@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { ECONOMIC_INDICES } from "@/config/indices"
 import { ExchangeRateValue } from "@/models/finance"
-import { latestPtaxUsdBrlRequest } from "@/utils/ptax"
+import { latestPtaxUsdBrlRequest } from "@/utils/bacen"
 
 const { t, locale } = useI18n()
 

@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { PhSpinnerGap } from "@phosphor-icons/vue"
 import { ExchangeRateValue } from "@/models/finance"
-import { latestPtaxUsdBrlRequest } from "@/utils/ptax"
+import { latestPtaxUsdBrlRequest } from "@/utils/bacen"
 
 const { t, locale } = useI18n()
 
