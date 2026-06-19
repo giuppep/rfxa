@@ -1,5 +1,6 @@
 import { ExchangeRateValue, IndexValue } from "@/models/finance"
 import { formatDate } from "./formatting"
+import { cachedRequest } from "@/utils/cache"
 
 interface BacenJsonValue {
     data: string
@@ -112,26 +113,29 @@ export const ptaxUsdBrlRequest = async (
         "exchange-rate:usd-brl:" +
         `${formatDate(periodStart, "iso")}:${formatDate(periodEnd, "iso")}`
 
-    const cached = sessionStorage.getItem(key)
-    if (cached) return deserializeExchangeRates(cached)
+    return cachedRequest({
+        key,
+        request: async () => {
+            const requestUrl = new URL(PTAX_USD_PERIOD_URL)
+            requestUrl.searchParams.set(
+                "@dataInicial",
+                `'${formatDate(periodStart, "mm-dd-yyyy")}'`
+            )
+            requestUrl.searchParams.set(
+                "@dataFinalCotacao",
+                `'${formatDate(periodEnd, "mm-dd-yyyy")}'`
+            )
+            requestUrl.searchParams.set("$format", "json")
 
-    const requestUrl = new URL(PTAX_USD_PERIOD_URL)
-    requestUrl.searchParams.set(
-        "@dataInicial",
-        `'${formatDate(periodStart, "mm-dd-yyyy")}'`
-    )
-    requestUrl.searchParams.set(
-        "@dataFinalCotacao",
-        `'${formatDate(periodEnd, "mm-dd-yyyy")}'`
-    )
-    requestUrl.searchParams.set("$format", "json")
+            const response = await fetch(requestUrl)
+            if (!response.ok)
+                throw new Error("Failed to fetch PTAX USD/BRL rates")
 
-    const response = await fetch(requestUrl)
-    if (!response.ok) throw new Error("Failed to fetch PTAX USD/BRL rates")
-
-    const rates = parsePtaxJson((await response.json()) as PtaxJsonResponse)
-    sessionStorage.setItem(key, serializeExchangeRates(rates))
-    return rates
+            return parsePtaxJson((await response.json()) as PtaxJsonResponse)
+        },
+        serialize: serializeExchangeRates,
+        deserialize: deserializeExchangeRates,
+    })
 }
 
 export const latestPtaxUsdBrlRequest = async () => {
