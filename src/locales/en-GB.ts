@@ -102,6 +102,7 @@ export default {
         latestAvailable: "Latest available {type} rate",
         previousDayChange: "Previous day",
         thirtyDayChange: "Last 30 days",
+        ninetyDayChange: "Last 90 days",
         dailyChart: "Daily exchange rate",
         chartLabel: "USD/BRL {type}",
         loading: "Loading exchange rate...",
