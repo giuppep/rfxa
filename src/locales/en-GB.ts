@@ -1,10 +1,18 @@
 export default {
     nav: {
         indices: "Indices",
+        exchange: "Exchange",
     },
     home: {
         tagline:
-            "Track Brazilian economic indices with month-on-month, year-on-year and cumulative changes over any period you choose.",
+            "Track Brazilian economic indices and the official USD exchange rate from BACEN.",
+        usdBrl: {
+            title: "USD/BRL",
+            description: "Official BACEN PTAX exchange rate.",
+            latest: "Latest available sell rate",
+            loading: "Loading rate...",
+            unavailable: "Rate unavailable",
+        },
     },
     notFound: {
         message: "This page doesn't exist.",
@@ -82,5 +90,22 @@ export default {
             mom: "MoM",
             yoy: "YoY",
         },
+    },
+    exchange: {
+        pageTitle: "USD/BRL exchange rate",
+        description:
+            "Official US dollar exchange rate published by the Brazilian Central Bank's PTAX service.",
+        rateTypes: {
+            buy: "Buy",
+            sell: "Sell",
+        },
+        latestAvailable: "Latest available {type} rate",
+        previousDayChange: "Previous day",
+        thirtyDayChange: "Last 30 days",
+        ninetyDayChange: "Last 90 days",
+        dailyChart: "Daily exchange rate",
+        chartLabel: "USD/BRL {type}",
+        loading: "Loading exchange rate...",
+        unavailable: "The exchange rate is unavailable right now.",
     },
 }

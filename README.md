@@ -1,7 +1,8 @@
 # rfxa
 
 A small Vue 3 + TypeScript + Vite app for tracking Brazilian economic
-indices — CDI, SELIC, IPCA and IGP-M — fetched from the BACEN and IPEA APIs.
+indices — CDI, SELIC, IPCA and IGP-M — and the official USD/BRL exchange rate
+using BACEN and IPEA APIs.
 
 For each index, the app shows:
 
@@ -10,6 +11,9 @@ For each index, the app shows:
 - the cumulative growth of an investment over that range, as both a chart
   series and a summary stat,
 - current MoM, YoY and YTD figures for the latest available month.
+
+The app also shows BACEN's latest available official PTAX USD/BRL exchange
+rate, with buy and sell quotes on a dedicated exchange-rate view.
 
 ## Getting started
 

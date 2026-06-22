@@ -8,3 +8,12 @@ export interface CumulativeIndexValue {
     value: number
     cumulativeLast12Months: number
 }
+
+export interface ExchangeRateValue {
+    date: Date
+    buy: number
+    sell: number
+    timestamp: Date
+}
+
+export type ExchangeRateType = "buy" | "sell"

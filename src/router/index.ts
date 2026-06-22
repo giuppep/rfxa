@@ -3,6 +3,7 @@ import HomeView from "@/views/HomeView.vue"
 import IndicesView from "@/views/IndicesView.vue"
 import NotFoundView from "@/views/NotFoundView.vue"
 import { ECONOMIC_INDICES } from "@/config/indices"
+import ExchangeRateView from "@/views/ExchangeRateView.vue"
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +21,11 @@ const router = createRouter({
                     props: true,
                 },
             ],
+        },
+        {
+            path: "/exchange/usd-brl",
+            name: "exchange-usd-brl",
+            component: ExchangeRateView,
         },
         {
             path: "/:pathMatch(.*)*",

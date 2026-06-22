@@ -1,10 +1,18 @@
 export default {
     nav: {
         indices: "Índices",
+        exchange: "Câmbio",
     },
     home: {
         tagline:
-            "Acompanhe os principais índices econômicos brasileiros com variações mensais, anuais e acumuladas em qualquer período.",
+            "Acompanhe os principais índices econômicos brasileiros e a cotação oficial do dólar pelo BACEN.",
+        usdBrl: {
+            title: "USD/BRL",
+            description: "Cotação oficial PTAX do BACEN.",
+            latest: "Última cotação de venda disponível",
+            loading: "Carregando cotação...",
+            unavailable: "Cotação indisponível",
+        },
     },
     notFound: {
         message: "Esta página não existe.",
@@ -81,5 +89,22 @@ export default {
             mom: "Mensal",
             yoy: "Anual",
         },
+    },
+    exchange: {
+        pageTitle: "Cotação USD/BRL",
+        description:
+            "Cotação oficial do dólar dos Estados Unidos publicada pelo serviço PTAX do Banco Central do Brasil.",
+        rateTypes: {
+            buy: "Compra",
+            sell: "Venda",
+        },
+        latestAvailable: "Última cotação de {type} disponível",
+        previousDayChange: "Dia anterior",
+        thirtyDayChange: "Últimos 30 dias",
+        ninetyDayChange: "Últimos 90 dias",
+        dailyChart: "Cotação diária",
+        chartLabel: "USD/BRL {type}",
+        loading: "Carregando cotação...",
+        unavailable: "A cotação está indisponível no momento.",
     },
 }
