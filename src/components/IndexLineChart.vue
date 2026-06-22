@@ -3,18 +3,19 @@ import { computed } from "vue"
 import { Line } from "vue-chartjs"
 import {
     Chart as ChartJS,
+    Filler,
     LineController,
     LineElement,
-    PointElement,
     LinearScale,
+    PointElement,
     TimeScale,
-    Filler,
     Tooltip,
     type ChartData,
     type ChartOptions,
 } from "chart.js"
 import "chartjs-adapter-date-fns"
 import { IndexValue, CumulativeIndexValue } from "@/models/finance"
+import { cssVarForChart } from "@/utils/css"
 
 ChartJS.register(
     LineController,
@@ -37,11 +38,25 @@ const props = withDefaults(
     { series: "mom" }
 )
 
-// rgb triplets so both the line and its translucent fill can share a color.
-const SERIES_COLOR: Record<typeof props.series, string> = {
-    mom: "30, 41, 59", // slate-800
-    yoy: "5, 150, 105", // emerald-600
-    total: "37, 99, 235", // blue-600
+const SERIES_COLORS: Record<
+    typeof props.series,
+    {
+        border: string
+        background: string
+    }
+> = {
+    mom: {
+        border: "--color-olive-800",
+        background: "--color-olive-100",
+    },
+    yoy: {
+        border: "--color-emerald-800",
+        background: "--color-emerald-50",
+    },
+    total: {
+        border: "--color-blue-800",
+        background: "--color-blue-50",
+    },
 }
 
 const seriesValue = (d: IndexValue | CumulativeIndexValue) => {
@@ -55,7 +70,10 @@ const seriesValue = (d: IndexValue | CumulativeIndexValue) => {
 
 const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
     () => {
-        const color = SERIES_COLOR[props.series]
+        const color = SERIES_COLORS[props.series]
+        const borderColor = cssVarForChart(color.border),
+            backgroundColor = cssVarForChart(color.background)
+
         return {
             datasets: [
                 {
@@ -63,14 +81,14 @@ const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
                         x: d.date.valueOf(),
                         y: seriesValue(d),
                     })),
-                    borderColor: `rgb(${color})`,
-                    backgroundColor: `rgba(${color}, 0.08)`,
+                    borderColor,
+                    backgroundColor,
                     fill: true,
                     tension: 0.1,
                     borderWidth: 2,
                     pointRadius: 0,
                     pointHoverRadius: 4,
-                    pointHoverBackgroundColor: `rgb(${color})`,
+                    pointHoverBackgroundColor: borderColor,
                 },
             ],
         }
@@ -116,7 +134,7 @@ const chartOptions = computed<ChartOptions<"line">>(() => ({
             grid: { display: false },
         },
         y: {
-            grid: { color: "#f1f5f9" },
+            grid: { color: cssVarForChart("--color-gray-100") },
             ticks: {
                 callback: (value) => `${(100 * Number(value)).toFixed(1)}%`,
             },

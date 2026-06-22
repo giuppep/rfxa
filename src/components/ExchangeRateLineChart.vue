@@ -16,6 +16,7 @@ import {
 } from "chart.js"
 import "chartjs-adapter-date-fns"
 import { ExchangeRateType, ExchangeRateValue } from "@/models/finance"
+import { cssVarForChart } from "@/utils/css"
 import { formatCurrency } from "@/utils/formatting"
 
 ChartJS.register(
@@ -37,14 +38,6 @@ const props = defineProps<{
 
 const { t, locale } = useI18n()
 
-const cssVar = (name: string, fallback: string = "") => {
-    const value = getComputedStyle(document.documentElement)
-        .getPropertyValue(name)
-        .trim()
-
-    return value || fallback
-}
-
 const chartRates = computed(() => [...props.exchangeRates].reverse())
 
 const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
@@ -58,14 +51,14 @@ const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
                     x: rate.date.valueOf(),
                     y: rate[props.exchangeRateType],
                 })),
-                borderColor: cssVar("--color-olive-700"),
-                backgroundColor: cssVar("--color-olive-200"),
+                borderColor: cssVarForChart("--color-olive-700"),
+                backgroundColor: cssVarForChart("--color-olive-200"),
                 fill: true,
                 tension: 0.1,
                 borderWidth: 2,
                 pointRadius: 0,
                 pointHoverRadius: 4,
-                pointHoverBackgroundColor: cssVar("--color-olive-800"),
+                pointHoverBackgroundColor: cssVarForChart("--color-olive-800"),
             },
         ],
     })
@@ -110,7 +103,7 @@ const chartOptions = computed<ChartOptions<"line">>(() => ({
             grid: { display: false },
         },
         y: {
-            grid: { color: cssVar("--color-gray-100") },
+            grid: { color: cssVarForChart("--color-gray-100") },
             ticks: {
                 callback: (value) => formatCurrency(Number(value)),
             },
