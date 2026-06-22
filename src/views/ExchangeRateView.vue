@@ -2,14 +2,21 @@
 import { computed, onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { PhSpinnerGap } from "@phosphor-icons/vue"
+import ExchangeRateLineChart from "@/components/ExchangeRateLineChart.vue"
 import { ExchangeRateValue } from "@/models/finance"
-import { latestPtaxUsdBrlRequest } from "@/utils/bacen"
+import { ptaxUsdBrlRequest } from "@/utils/bacen"
 
 const { t, locale } = useI18n()
 
-const latestRate = ref<ExchangeRateValue>()
+const exchangeRates = ref<ExchangeRateValue[]>([])
 const loading = ref(true)
 const error = ref(false)
+
+const periodEnd = ref(new Date())
+const periodStart = ref(new Date(periodEnd.value))
+periodStart.value.setDate(periodStart.value.getDate() - 90)
+
+const latestRate = computed(() => exchangeRates.value[0])
 
 const currencyFormatter = computed(
     () =>
@@ -42,7 +49,10 @@ const formatDateTime = (date: Date) => dateTimeFormatter.value.format(date)
 
 onMounted(async () => {
     try {
-        latestRate.value = await latestPtaxUsdBrlRequest()
+        exchangeRates.value = await ptaxUsdBrlRequest(
+            periodStart.value,
+            periodEnd.value
+        )
     } catch {
         error.value = true
     } finally {
@@ -110,6 +120,17 @@ onMounted(async () => {
                     })
                 }}
             </p>
+
+            <div class="mt-8 border-t border-olive-200 pt-4">
+                <h3>{{ t("exchange.dailyChart") }}</h3>
+                <div class="mt-4 rounded-lg bg-white shadow-sm">
+                    <ExchangeRateLineChart
+                        :exchange-rates="exchangeRates"
+                        :period-start="periodStart"
+                        :period-end="periodEnd"
+                    />
+                </div>
+            </div>
         </div>
     </div>
 </template>
