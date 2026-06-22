@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { PhSpinnerGap } from "@phosphor-icons/vue"
 import ExchangeRateLineChart from "@/components/ExchangeRateLineChart.vue"
+import ToggleSwitch from "@/components/ToggleSwitch.vue"
 import { ExchangeRateType, ExchangeRateValue } from "@/models/finance"
 import { ptaxUsdBrlRequest } from "@/utils/bacen"
 
@@ -12,7 +13,13 @@ const exchangeRates = ref<ExchangeRateValue[]>([])
 const loading = ref(true)
 const error = ref(false)
 const exchangeRateType = ref<ExchangeRateType>("sell")
-const EXCHANGE_RATE_TYPES: ExchangeRateType[] = ["sell", "buy"]
+const exchangeRateTypeOptions = computed(() => {
+    const exchangeRateTypes: ExchangeRateType[] = ["sell", "buy"]
+    return exchangeRateTypes.map((type) => ({
+        value: type,
+        label: t(`exchange.rateTypes.${type}`),
+    }))
+})
 
 const periodEnd = ref(new Date())
 const periodStart = ref(new Date(periodEnd.value))
@@ -115,24 +122,11 @@ onMounted(async () => {
         </p>
 
         <div v-else class="mt-8 max-w-3xl">
-            <div
-                class="mb-4 inline-flex rounded-full bg-olive-200 p-1 text-sm font-medium"
-            >
-                <button
-                    v-for="type in EXCHANGE_RATE_TYPES"
-                    :key="type"
-                    type="button"
-                    class="rounded-full px-3 py-1 transition-colors cursor-pointer"
-                    :class="
-                        exchangeRateType === type
-                            ? 'bg-olive-500 text-olive-50'
-                            : 'text-olive-700 hover:bg-olive-300'
-                    "
-                    @click="exchangeRateType = type"
-                >
-                    {{ t(`exchange.rateTypes.${type}`) }}
-                </button>
-            </div>
+            <ToggleSwitch
+                v-model="exchangeRateType"
+                :options="exchangeRateTypeOptions"
+                class="mb-4"
+            />
 
             <div class="rounded-lg bg-white p-5 shadow-sm">
                 <div class="text-sm font-medium text-olive-600">
