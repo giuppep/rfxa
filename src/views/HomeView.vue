@@ -4,24 +4,13 @@ import { useI18n } from "vue-i18n"
 import { ECONOMIC_INDICES } from "@/config/indices"
 import { ExchangeRateValue } from "@/models/finance"
 import { latestPtaxUsdBrlRequest } from "@/utils/bacen"
+import { formatCurrency } from "@/utils/formatting"
 
 const { t, locale } = useI18n()
 
 const latestUsdRate = ref<ExchangeRateValue>()
 const exchangeRateLoading = ref(true)
 const exchangeRateError = ref(false)
-
-const currencyFormatter = computed(
-    () =>
-        new Intl.NumberFormat(locale.value, {
-            style: "currency",
-            currency: "BRL",
-            minimumFractionDigits: 4,
-            maximumFractionDigits: 4,
-        })
-)
-
-const formatCurrency = (value: number) => currencyFormatter.value.format(value)
 
 onMounted(async () => {
     try {
@@ -66,7 +55,7 @@ onMounted(async () => {
                         v-if="latestUsdRate"
                         class="slashed-zero font-mono text-sm font-semibold text-olive-700"
                     >
-                        {{ formatCurrency(latestUsdRate.sell) }}
+                        {{ formatCurrency(latestUsdRate.sell, locale) }}
                     </div>
                 </div>
                 <div class="mt-1 text-sm text-olive-600">
