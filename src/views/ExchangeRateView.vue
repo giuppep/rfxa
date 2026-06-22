@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from "vue"
 import { useI18n } from "vue-i18n"
 import { PhSpinnerGap } from "@phosphor-icons/vue"
 import ExchangeRateLineChart from "@/components/ExchangeRateLineChart.vue"
-import { ExchangeRateValue } from "@/models/finance"
+import { ExchangeRateType, ExchangeRateValue } from "@/models/finance"
 import { ptaxUsdBrlRequest } from "@/utils/bacen"
 
 const { t, locale } = useI18n()
@@ -11,12 +11,17 @@ const { t, locale } = useI18n()
 const exchangeRates = ref<ExchangeRateValue[]>([])
 const loading = ref(true)
 const error = ref(false)
+const exchangeRateType = ref<ExchangeRateType>("sell")
+const EXCHANGE_RATE_TYPES: ExchangeRateType[] = ["sell", "buy"]
 
 const periodEnd = ref(new Date())
 const periodStart = ref(new Date(periodEnd.value))
 periodStart.value.setDate(periodStart.value.getDate() - 90)
 
 const latestRate = computed(() => exchangeRates.value[0])
+const latestRateValue = computed(
+    () => latestRate.value?.[exchangeRateType.value]
+)
 const previousRate = computed(() => exchangeRates.value[1])
 const thirtyDaysAgoRate = computed(() => {
     if (!latestRate.value) return undefined
@@ -40,14 +45,6 @@ const currencyFormatter = computed(
         })
 )
 
-const dateTimeFormatter = computed(
-    () =>
-        new Intl.DateTimeFormat(locale.value, {
-            dateStyle: "medium",
-            timeStyle: "short",
-        })
-)
-
 const dateFormatter = computed(
     () =>
         new Intl.DateTimeFormat(locale.value, {
@@ -57,7 +54,6 @@ const dateFormatter = computed(
 
 const formatCurrency = (value: number) => currencyFormatter.value.format(value)
 const formatDate = (date: Date) => dateFormatter.value.format(date)
-const formatDateTime = (date: Date) => dateTimeFormatter.value.format(date)
 const percentFormatter = computed(
     () =>
         new Intl.NumberFormat(locale.value, {
@@ -68,8 +64,12 @@ const percentFormatter = computed(
         })
 )
 const rateChange = (baseRate?: ExchangeRateValue) => {
-    if (!latestRate.value || !baseRate || baseRate.sell === 0) return undefined
-    return latestRate.value.sell / baseRate.sell - 1
+    if (!latestRate.value || !baseRate) return undefined
+
+    const baseValue = baseRate[exchangeRateType.value]
+    if (baseValue === 0) return undefined
+
+    return latestRate.value[exchangeRateType.value] / baseValue - 1
 }
 const previousDayChange = computed(() => rateChange(previousRate.value))
 const thirtyDayChange = computed(() => rateChange(thirtyDaysAgoRate.value))
@@ -111,12 +111,35 @@ onMounted(async () => {
         </p>
 
         <div v-else class="mt-8 max-w-3xl">
+            <div
+                class="mb-4 inline-flex rounded-full bg-olive-200 p-1 text-sm font-medium"
+            >
+                <button
+                    v-for="type in EXCHANGE_RATE_TYPES"
+                    :key="type"
+                    type="button"
+                    class="rounded-full px-3 py-1 transition-colors cursor-pointer"
+                    :class="
+                        exchangeRateType === type
+                            ? 'bg-olive-500 text-olive-50'
+                            : 'text-olive-700 hover:bg-olive-300'
+                    "
+                    @click="exchangeRateType = type"
+                >
+                    {{ t(`exchange.rateTypes.${type}`) }}
+                </button>
+            </div>
+
             <div class="rounded-lg bg-white p-5 shadow-sm">
                 <div class="text-sm font-medium text-olive-600">
-                    {{ t("exchange.latestAvailable") }}
+                    {{
+                        t("exchange.latestAvailable", {
+                            type: t(`exchange.rateTypes.${exchangeRateType}`),
+                        })
+                    }}
                 </div>
                 <div class="mt-1 slashed-zero font-mono text-4xl font-semibold">
-                    {{ formatCurrency(latestRate.sell) }}
+                    {{ formatCurrency(latestRateValue) }}
                 </div>
                 <div class="mt-1 text-sm text-olive-500">
                     {{ formatDate(latestRate.date) }}
@@ -163,6 +186,7 @@ onMounted(async () => {
                 <div class="mt-4 rounded-lg bg-white shadow-sm">
                     <ExchangeRateLineChart
                         :exchange-rates="exchangeRates"
+                        :exchange-rate-type="exchangeRateType"
                         :period-start="periodStart"
                         :period-end="periodEnd"
                     />

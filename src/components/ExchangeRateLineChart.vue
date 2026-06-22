@@ -15,7 +15,7 @@ import {
     type ChartOptions,
 } from "chart.js"
 import "chartjs-adapter-date-fns"
-import { ExchangeRateValue } from "@/models/finance"
+import { ExchangeRateType, ExchangeRateValue } from "@/models/finance"
 
 ChartJS.register(
     LineController,
@@ -29,11 +29,12 @@ ChartJS.register(
 
 const props = defineProps<{
     exchangeRates: ExchangeRateValue[]
+    exchangeRateType: ExchangeRateType
     periodStart: Date
     periodEnd: Date
 }>()
 
-const { locale } = useI18n()
+const { t, locale } = useI18n()
 
 const currencyFormatter = computed(
     () =>
@@ -51,10 +52,12 @@ const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
     () => ({
         datasets: [
             {
-                label: "USD/BRL",
+                label: t("exchange.chartLabel", {
+                    type: t(`exchange.rateTypes.${props.exchangeRateType}`),
+                }),
                 data: chartRates.value.map((rate) => ({
                     x: rate.date.valueOf(),
-                    y: rate.sell,
+                    y: rate[props.exchangeRateType],
                 })),
                 borderColor: "rgb(37, 99, 235)",
                 backgroundColor: "rgba(37, 99, 235, 0.08)",

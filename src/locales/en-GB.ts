@@ -95,10 +95,15 @@ export default {
         pageTitle: "USD/BRL exchange rate",
         description:
             "Official US dollar exchange rate published by the Brazilian Central Bank's PTAX service.",
-        latestAvailable: "Latest available sell rate",
+        rateTypes: {
+            buy: "Buy",
+            sell: "Sell",
+        },
+        latestAvailable: "Latest available {type} rate",
         previousDayChange: "Previous day",
         thirtyDayChange: "Last 30 days",
         dailyChart: "Daily exchange rate",
+        chartLabel: "USD/BRL {type}",
         loading: "Loading exchange rate...",
         unavailable: "The exchange rate is unavailable right now.",
     },
