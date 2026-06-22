@@ -1,11 +1,19 @@
 <script setup lang="ts">
+import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import { i18n } from "@/i18n"
 import { PhGithubLogo } from "@phosphor-icons/vue"
+import ToggleSwitch from "@/components/ToggleSwitch.vue"
 
 const { t, locale } = useI18n()
 
 const availableLocales = i18n.global.availableLocales
+const localeOptions = computed(() =>
+    availableLocales.map((code) => ({
+        value: code,
+        label: code.split("-")[0].toUpperCase(),
+    }))
+)
 
 const setLocale = (code: string) => {
     locale.value = code
@@ -39,23 +47,13 @@ const setLocale = (code: string) => {
             </li>
         </ul>
 
-        <div
-            class="ml-auto flex items-center rounded-full bg-olive-300 p-0.5 text-xs font-medium"
-        >
-            <button
-                v-for="code in availableLocales"
-                :key="code"
-                class="rounded-full px-2 py-0.5 transition-colors cursor-pointer"
-                :class="
-                    locale === code
-                        ? 'bg-olive-500 text-olive-50'
-                        : 'text-olive-600'
-                "
-                @click="setLocale(code)"
-            >
-                {{ code.split("-")[0].toUpperCase() }}
-            </button>
-        </div>
+        <ToggleSwitch
+            :model-value="locale"
+            :options="localeOptions"
+            size="sm"
+            class="ml-auto bg-olive-300"
+            @update:model-value="setLocale"
+        />
         <a href="https://github.com/giuppep/rfxa" target="_blank">
             <PhGithubLogo
                 weight="fill"
