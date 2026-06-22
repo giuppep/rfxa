@@ -94,10 +94,15 @@ export default {
         pageTitle: "Cotação USD/BRL",
         description:
             "Cotação oficial do dólar dos Estados Unidos publicada pelo serviço PTAX do Banco Central do Brasil.",
-        latestAvailable: "Última cotação de venda disponível",
+        rateTypes: {
+            buy: "Compra",
+            sell: "Venda",
+        },
+        latestAvailable: "Última cotação de {type} disponível",
         previousDayChange: "Dia anterior",
         thirtyDayChange: "Últimos 30 dias",
         dailyChart: "Cotação diária",
+        chartLabel: "USD/BRL {type}",
         loading: "Carregando cotação...",
         unavailable: "A cotação está indisponível no momento.",
     },

@@ -15,3 +15,5 @@ export interface ExchangeRateValue {
     sell: number
     timestamp: Date
 }
+
+export type ExchangeRateType = "buy" | "sell"
