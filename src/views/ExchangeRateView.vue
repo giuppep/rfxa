@@ -17,6 +17,18 @@ const periodStart = ref(new Date(periodEnd.value))
 periodStart.value.setDate(periodStart.value.getDate() - 90)
 
 const latestRate = computed(() => exchangeRates.value[0])
+const previousRate = computed(() => exchangeRates.value[1])
+const thirtyDaysAgoRate = computed(() => {
+    if (!latestRate.value) return undefined
+
+    const targetDate = new Date(latestRate.value.date)
+    targetDate.setDate(targetDate.getDate() - 30)
+
+    return (
+        exchangeRates.value.find((rate) => rate.date <= targetDate) ??
+        exchangeRates.value[exchangeRates.value.length - 1]
+    )
+})
 
 const currencyFormatter = computed(
     () =>
@@ -46,6 +58,27 @@ const dateFormatter = computed(
 const formatCurrency = (value: number) => currencyFormatter.value.format(value)
 const formatDate = (date: Date) => dateFormatter.value.format(date)
 const formatDateTime = (date: Date) => dateTimeFormatter.value.format(date)
+const percentFormatter = computed(
+    () =>
+        new Intl.NumberFormat(locale.value, {
+            style: "percent",
+            signDisplay: "always",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        })
+)
+const rateChange = (baseRate?: ExchangeRateValue) => {
+    if (!latestRate.value || !baseRate || baseRate.sell === 0) return undefined
+    return latestRate.value.sell / baseRate.sell - 1
+}
+const previousDayChange = computed(() => rateChange(previousRate.value))
+const thirtyDayChange = computed(() => rateChange(thirtyDaysAgoRate.value))
+const formatPercent = (value?: number) =>
+    value === undefined ? "--" : percentFormatter.value.format(value)
+const variationClass = (value?: number) => {
+    if (value === undefined || value === 0) return "text-olive-700"
+    return value > 0 ? "text-emerald-700" : "text-red-700"
+}
 
 onMounted(async () => {
     try {
@@ -68,10 +101,7 @@ onMounted(async () => {
             {{ t("exchange.description") }}
         </p>
 
-        <div
-            v-if="loading"
-            class="mt-8 flex items-center gap-2 text-olive-500"
-        >
+        <div v-if="loading" class="mt-8 flex items-center gap-2 text-olive-500">
             <PhSpinnerGap class="h-5 w-5 animate-spin" />
             {{ t("exchange.loading") }}
         </div>
@@ -96,19 +126,34 @@ onMounted(async () => {
             <div class="mt-4 grid gap-4 sm:grid-cols-2">
                 <div class="rounded-lg bg-white p-4 shadow-sm">
                     <div class="text-sm font-medium text-olive-600">
-                        {{ t("exchange.buy") }}
+                        {{ t("exchange.previousDayChange") }}
                     </div>
-                    <div class="slashed-zero font-mono text-2xl font-semibold">
-                        {{ formatCurrency(latestRate.buy) }}
+                    <div
+                        class="slashed-zero font-mono text-2xl font-semibold"
+                        :class="variationClass(previousDayChange)"
+                    >
+                        {{ formatPercent(previousDayChange) }}
+                    </div>
+                    <div v-if="previousRate" class="text-xs text-olive-400">
+                        {{ formatDate(previousRate.date) }}
                     </div>
                 </div>
 
                 <div class="rounded-lg bg-white p-4 shadow-sm">
                     <div class="text-sm font-medium text-olive-600">
-                        {{ t("exchange.sell") }}
+                        {{ t("exchange.thirtyDayChange") }}
                     </div>
-                    <div class="slashed-zero font-mono text-2xl font-semibold">
-                        {{ formatCurrency(latestRate.sell) }}
+                    <div
+                        class="slashed-zero font-mono text-2xl font-semibold"
+                        :class="variationClass(thirtyDayChange)"
+                    >
+                        {{ formatPercent(thirtyDayChange) }}
+                    </div>
+                    <div
+                        v-if="thirtyDaysAgoRate"
+                        class="text-xs text-olive-400"
+                    >
+                        {{ formatDate(thirtyDaysAgoRate.date) }}
                     </div>
                 </div>
             </div>
