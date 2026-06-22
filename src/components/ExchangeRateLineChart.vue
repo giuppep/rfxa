@@ -16,6 +16,7 @@ import {
 } from "chart.js"
 import "chartjs-adapter-date-fns"
 import { ExchangeRateType, ExchangeRateValue } from "@/models/finance"
+import { formatCurrency } from "@/utils/formatting"
 
 ChartJS.register(
     LineController,
@@ -35,16 +36,6 @@ const props = defineProps<{
 }>()
 
 const { t, locale } = useI18n()
-
-const currencyFormatter = computed(
-    () =>
-        new Intl.NumberFormat(locale.value, {
-            style: "currency",
-            currency: "BRL",
-            minimumFractionDigits: 4,
-            maximumFractionDigits: 4,
-        })
-)
 
 const chartRates = computed(() => [...props.exchangeRates].reverse())
 
@@ -84,8 +75,6 @@ const xMax = computed(() =>
         : props.periodEnd.valueOf()
 )
 
-const formatCurrency = (value: number) => currencyFormatter.value.format(value)
-
 const chartOptions = computed<ChartOptions<"line">>(() => ({
     responsive: true,
     maintainAspectRatio: false,
@@ -96,7 +85,7 @@ const chartOptions = computed<ChartOptions<"line">>(() => ({
         tooltip: {
             callbacks: {
                 label: (ctx) =>
-                    `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y ?? 0)}`,
+                    `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y ?? 0, locale)}`,
             },
         },
     },

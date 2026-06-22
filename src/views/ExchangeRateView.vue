@@ -6,6 +6,7 @@ import ExchangeRateLineChart from "@/components/ExchangeRateLineChart.vue"
 import ToggleSwitch from "@/components/ToggleSwitch.vue"
 import { ExchangeRateType, ExchangeRateValue } from "@/models/finance"
 import { ptaxUsdBrlRequest } from "@/utils/bacen"
+import { formatCurrency } from "@/utils/formatting"
 
 const { t, locale } = useI18n()
 
@@ -51,16 +52,6 @@ const ninetyDaysAgoRate = computed(
     () => exchangeRates.value[exchangeRates.value.length - 1]
 )
 
-const currencyFormatter = computed(
-    () =>
-        new Intl.NumberFormat(locale.value, {
-            style: "currency",
-            currency: "BRL",
-            minimumFractionDigits: 4,
-            maximumFractionDigits: 4,
-        })
-)
-
 const dateFormatter = computed(
     () =>
         new Intl.DateTimeFormat(locale.value, {
@@ -68,7 +59,6 @@ const dateFormatter = computed(
         })
 )
 
-const formatCurrency = (value: number) => currencyFormatter.value.format(value)
 const formatDate = (date: Date) => dateFormatter.value.format(date)
 const percentFormatter = computed(
     () =>
@@ -144,7 +134,7 @@ onMounted(async () => {
                     }}
                 </div>
                 <div class="mt-1 slashed-zero font-mono text-4xl font-semibold">
-                    {{ formatCurrency(latestRateValue) }}
+                    {{ formatCurrency(latestRateValue, locale) }}
                 </div>
                 <div class="mt-1 text-sm text-olive-500">
                     {{ formatDate(latestRate.date) }}

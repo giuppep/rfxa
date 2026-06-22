@@ -12,3 +12,13 @@ export const formatDate = (
         return `${month}-${day}-${date.getFullYear()}`
     return `${day}-${month}-${date.getFullYear()}`
 }
+
+export const formatCurrency = (value: number, locale: string = "en-GB") => {
+    const formatter = new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: "BRL",
+        minimumFractionDigits: 4,
+        maximumFractionDigits: 4,
+    })
+    return formatter.format(value)
+}
