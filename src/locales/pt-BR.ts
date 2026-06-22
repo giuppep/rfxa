@@ -101,6 +101,7 @@ export default {
         latestAvailable: "Última cotação de {type} disponível",
         previousDayChange: "Dia anterior",
         thirtyDayChange: "Últimos 30 dias",
+        ninetyDayChange: "Últimos 90 dias",
         dailyChart: "Cotação diária",
         chartLabel: "USD/BRL {type}",
         loading: "Carregando cotação...",

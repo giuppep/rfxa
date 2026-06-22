@@ -34,6 +34,9 @@ const thirtyDaysAgoRate = computed(() => {
         exchangeRates.value[exchangeRates.value.length - 1]
     )
 })
+const ninetyDaysAgoRate = computed(
+    () => exchangeRates.value[exchangeRates.value.length - 1]
+)
 
 const currencyFormatter = computed(
     () =>
@@ -73,6 +76,7 @@ const rateChange = (baseRate?: ExchangeRateValue) => {
 }
 const previousDayChange = computed(() => rateChange(previousRate.value))
 const thirtyDayChange = computed(() => rateChange(thirtyDaysAgoRate.value))
+const ninetyDayChange = computed(() => rateChange(ninetyDaysAgoRate.value))
 const formatPercent = (value?: number) =>
     value === undefined ? "--" : percentFormatter.value.format(value)
 const variationClass = (value?: number) => {
@@ -146,7 +150,7 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            <div class="mt-4 grid gap-4 sm:grid-cols-3">
                 <div class="rounded-lg bg-white p-4 shadow-sm">
                     <div class="text-sm font-medium text-olive-600">
                         {{ t("exchange.previousDayChange") }}
@@ -177,6 +181,24 @@ onMounted(async () => {
                         class="text-xs text-olive-400"
                     >
                         {{ formatDate(thirtyDaysAgoRate.date) }}
+                    </div>
+                </div>
+
+                <div class="rounded-lg bg-white p-4 shadow-sm">
+                    <div class="text-sm font-medium text-olive-600">
+                        {{ t("exchange.ninetyDayChange") }}
+                    </div>
+                    <div
+                        class="slashed-zero font-mono text-2xl font-semibold"
+                        :class="variationClass(ninetyDayChange)"
+                    >
+                        {{ formatPercent(ninetyDayChange) }}
+                    </div>
+                    <div
+                        v-if="ninetyDaysAgoRate"
+                        class="text-xs text-olive-400"
+                    >
+                        {{ formatDate(ninetyDaysAgoRate.date) }}
                     </div>
                 </div>
             </div>
