@@ -37,6 +37,14 @@ const props = defineProps<{
 
 const { t, locale } = useI18n()
 
+const cssVar = (name: string, fallback: string = "") => {
+    const value = getComputedStyle(document.documentElement)
+        .getPropertyValue(name)
+        .trim()
+
+    return value || fallback
+}
+
 const chartRates = computed(() => [...props.exchangeRates].reverse())
 
 const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
@@ -50,14 +58,14 @@ const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
                     x: rate.date.valueOf(),
                     y: rate[props.exchangeRateType],
                 })),
-                borderColor: "rgb(37, 99, 235)",
-                backgroundColor: "rgba(37, 99, 235, 0.08)",
+                borderColor: cssVar("--color-olive-700"),
+                backgroundColor: cssVar("--color-olive-200"),
                 fill: true,
                 tension: 0.1,
                 borderWidth: 2,
                 pointRadius: 0,
                 pointHoverRadius: 4,
-                pointHoverBackgroundColor: "rgb(37, 99, 235)",
+                pointHoverBackgroundColor: cssVar("--color-olive-800"),
             },
         ],
     })
@@ -102,7 +110,7 @@ const chartOptions = computed<ChartOptions<"line">>(() => ({
             grid: { display: false },
         },
         y: {
-            grid: { color: "#f1f5f9" },
+            grid: { color: cssVar("--color-gray-100") },
             ticks: {
                 callback: (value) => formatCurrency(Number(value)),
             },
