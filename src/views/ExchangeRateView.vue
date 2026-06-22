@@ -25,11 +25,17 @@ const periodEnd = ref(new Date())
 const periodStart = ref(new Date(periodEnd.value))
 periodStart.value.setDate(periodStart.value.getDate() - 90)
 
+// BACEN PTAX values are sorted newest-first in bacen.ts, so the latest record
+// is always the first item in the loaded range.
 const latestRate = computed(() => exchangeRates.value[0])
 const latestRateValue = computed(
     () => latestRate.value?.[exchangeRateType.value]
 )
 const previousRate = computed(() => exchangeRates.value[1])
+
+// PTAX quotes are only published on business days. For a "30 days" comparison,
+// use the first available quote on or before the target calendar date, falling
+// back to the oldest loaded quote if the exact window is unavailable.
 const thirtyDaysAgoRate = computed(() => {
     if (!latestRate.value) return undefined
 
@@ -76,6 +82,7 @@ const percentFormatter = computed(
 const rateChange = (baseRate?: ExchangeRateValue) => {
     if (!latestRate.value || !baseRate) return undefined
 
+    // Compute variation against whichever PTAX side the user selected.
     const baseValue = baseRate[exchangeRateType.value]
     if (baseValue === 0) return undefined
 

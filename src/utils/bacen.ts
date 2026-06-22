@@ -141,6 +141,9 @@ export const ptaxUsdBrlRequest = async (
 export const latestPtaxUsdBrlRequest = async () => {
     const periodEnd = new Date()
     const periodStart = new Date(periodEnd)
+
+    // Today may not have a PTAX quote yet, and weekends/holidays have no
+    // quotes, so fetch a small window and use the newest returned record.
     periodStart.setDate(periodStart.getDate() - 10)
 
     const rates = await ptaxUsdBrlRequest(periodStart, periodEnd)
