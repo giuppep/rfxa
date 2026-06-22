@@ -98,6 +98,7 @@ export default {
         latestAvailable: "Latest available sell rate",
         buy: "Buy",
         sell: "Sell",
+        dailyChart: "Daily exchange rate",
         timestamp: "BACEN quote timestamp: {timestamp}",
         loading: "Loading exchange rate...",
         unavailable: "The exchange rate is unavailable right now.",

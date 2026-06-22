@@ -97,6 +97,7 @@ export default {
         latestAvailable: "Última cotação de venda disponível",
         buy: "Compra",
         sell: "Venda",
+        dailyChart: "Cotação diária",
         timestamp: "Data e hora da cotação no BACEN: {timestamp}",
         loading: "Carregando cotação...",
         unavailable: "A cotação está indisponível no momento.",
