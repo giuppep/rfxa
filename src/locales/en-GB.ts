@@ -99,7 +99,6 @@ export default {
         previousDayChange: "Previous day",
         thirtyDayChange: "Last 30 days",
         dailyChart: "Daily exchange rate",
-        timestamp: "BACEN quote timestamp: {timestamp}",
         loading: "Loading exchange rate...",
         unavailable: "The exchange rate is unavailable right now.",
     },

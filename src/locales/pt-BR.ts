@@ -98,7 +98,6 @@ export default {
         previousDayChange: "Dia anterior",
         thirtyDayChange: "Últimos 30 dias",
         dailyChart: "Cotação diária",
-        timestamp: "Data e hora da cotação no BACEN: {timestamp}",
         loading: "Carregando cotação...",
         unavailable: "A cotação está indisponível no momento.",
     },

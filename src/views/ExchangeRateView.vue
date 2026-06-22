@@ -158,14 +158,6 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <p class="mt-4 text-sm text-olive-600">
-                {{
-                    t("exchange.timestamp", {
-                        timestamp: formatDateTime(latestRate.timestamp),
-                    })
-                }}
-            </p>
-
             <div class="mt-8 border-t border-olive-200 pt-4">
                 <h3>{{ t("exchange.dailyChart") }}</h3>
                 <div class="mt-4 rounded-lg bg-white shadow-sm">
