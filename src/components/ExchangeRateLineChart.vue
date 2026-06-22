@@ -85,7 +85,7 @@ const chartOptions = computed<ChartOptions<"line">>(() => ({
         tooltip: {
             callbacks: {
                 label: (ctx) =>
-                    `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y ?? 0, locale)}`,
+                    `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y ?? 0, locale.value)}`,
             },
         },
     },
