@@ -96,8 +96,8 @@ export default {
         description:
             "Official US dollar exchange rate published by the Brazilian Central Bank's PTAX service.",
         latestAvailable: "Latest available sell rate",
-        buy: "Buy",
-        sell: "Sell",
+        previousDayChange: "Previous day",
+        thirtyDayChange: "Last 30 days",
         dailyChart: "Daily exchange rate",
         timestamp: "BACEN quote timestamp: {timestamp}",
         loading: "Loading exchange rate...",

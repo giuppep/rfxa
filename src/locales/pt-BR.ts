@@ -95,8 +95,8 @@ export default {
         description:
             "Cotação oficial do dólar dos Estados Unidos publicada pelo serviço PTAX do Banco Central do Brasil.",
         latestAvailable: "Última cotação de venda disponível",
-        buy: "Compra",
-        sell: "Venda",
+        previousDayChange: "Dia anterior",
+        thirtyDayChange: "Últimos 30 dias",
         dailyChart: "Cotação diária",
         timestamp: "Data e hora da cotação no BACEN: {timestamp}",
         loading: "Carregando cotação...",

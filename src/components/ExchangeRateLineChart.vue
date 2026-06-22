@@ -5,7 +5,6 @@ import { Line } from "vue-chartjs"
 import {
     Chart as ChartJS,
     Filler,
-    Legend,
     LineController,
     LineElement,
     LinearScale,
@@ -25,8 +24,7 @@ ChartJS.register(
     LinearScale,
     TimeScale,
     Filler,
-    Tooltip,
-    Legend
+    Tooltip
 )
 
 const props = defineProps<{
@@ -35,7 +33,7 @@ const props = defineProps<{
     periodEnd: Date
 }>()
 
-const { t, locale } = useI18n()
+const { locale } = useI18n()
 
 const currencyFormatter = computed(
     () =>
@@ -53,7 +51,7 @@ const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
     () => ({
         datasets: [
             {
-                label: t("exchange.sell"),
+                label: "USD/BRL",
                 data: chartRates.value.map((rate) => ({
                     x: rate.date.valueOf(),
                     y: rate.sell,
@@ -66,21 +64,6 @@ const chartData = computed<ChartData<"line", { x: number; y: number }[]>>(
                 pointRadius: 0,
                 pointHoverRadius: 4,
                 pointHoverBackgroundColor: "rgb(37, 99, 235)",
-            },
-            {
-                label: t("exchange.buy"),
-                data: chartRates.value.map((rate) => ({
-                    x: rate.date.valueOf(),
-                    y: rate.buy,
-                })),
-                borderColor: "rgb(5, 150, 105)",
-                backgroundColor: "rgba(5, 150, 105, 0.04)",
-                fill: false,
-                tension: 0.1,
-                borderWidth: 2,
-                pointRadius: 0,
-                pointHoverRadius: 4,
-                pointHoverBackgroundColor: "rgb(5, 150, 105)",
             },
         ],
     })
@@ -105,8 +88,7 @@ const chartOptions = computed<ChartOptions<"line">>(() => ({
     maintainAspectRatio: false,
     plugins: {
         legend: {
-            display: true,
-            labels: { boxWidth: 10, boxHeight: 10 },
+            display: false,
         },
         tooltip: {
             callbacks: {
