@@ -171,7 +171,7 @@ watchEffect(async () => {
 </script>
 
 <template>
-    <div class="p-4">
+    <div>
         <h2>{{ t("indices.pageTitle") }}</h2>
         <div class="flex flex-col gap-0.5 mb-4">
             <span class="font-medium text-olive-700 text-sm">
