@@ -1,5 +1,6 @@
 import { IndexValue } from "@/models/finance"
 import { IndexConfig } from "@/config/indices"
+import { formatDate } from "@/utils/formatting"
 
 interface SerializedIndexValue {
     date: string
@@ -12,17 +13,30 @@ type IndexRequest = (
     periodEnd?: Date
 ) => Promise<IndexValue[]>
 
-const formatCacheDate = (date?: Date) => {
-    if (!date) return ""
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, "0")
-    const day = String(date.getDate()).padStart(2, "0")
-    return `${year}-${month}-${day}`
+interface CachedRequestOptions<T> {
+    key: string
+    request: () => Promise<T[]>
+    serialize?: (values: T[]) => string
+    deserialize?: (value: string) => T[]
 }
 
 const cacheKey = (index: IndexConfig, periodStart?: Date, periodEnd?: Date) =>
     `index-values:${index.id}:${index.provider}:` +
-    `${formatCacheDate(periodStart)}:${formatCacheDate(periodEnd)}`
+    `${formatDate(periodStart)}:${formatDate(periodEnd)}`
+
+export const cachedRequest = async <T>({
+    key,
+    request,
+    serialize = JSON.stringify,
+    deserialize = JSON.parse,
+}: CachedRequestOptions<T>): Promise<T[]> => {
+    const cached = sessionStorage.getItem(key)
+    if (cached) return deserialize(cached)
+
+    const values = await request()
+    sessionStorage.setItem(key, serialize(values))
+    return values
+}
 
 /** Wraps an index *Request helper with a sessionStorage cache keyed by
  *  index, provider and time span, so the same data isn't refetched on
@@ -33,16 +47,12 @@ export const cachedIndexRequest = async (
     periodStart?: Date,
     periodEnd?: Date
 ): Promise<IndexValue[]> => {
-    const key = cacheKey(index, periodStart, periodEnd)
-
-    const cached = sessionStorage.getItem(key)
-    if (cached) {
-        return (JSON.parse(cached) as SerializedIndexValue[]).map(
-            ({ date, value }) => ({ date: new Date(date), value })
-        )
-    }
-
-    const indexValues = await request(index.url, periodStart, periodEnd)
-    sessionStorage.setItem(key, JSON.stringify(indexValues))
-    return indexValues
+    return cachedRequest({
+        key: cacheKey(index, periodStart, periodEnd),
+        request: () => request(index.url, periodStart, periodEnd),
+        deserialize: (value) =>
+            (JSON.parse(value) as SerializedIndexValue[]).map(
+                ({ date, value }) => ({ date: new Date(date), value })
+            ),
+    })
 }
