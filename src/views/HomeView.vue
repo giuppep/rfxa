@@ -24,7 +24,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="py-8">
+    <div>
         <h1>rfxa</h1>
         <p class="mt-2 max-w-2xl text-olive-700">
             {{ t("home.tagline") }}
