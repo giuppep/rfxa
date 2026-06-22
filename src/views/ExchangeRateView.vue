@@ -103,7 +103,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="py-8">
+    <div class="p-4">
         <h2>{{ t("exchange.pageTitle") }}</h2>
         <p class="mt-2 max-w-2xl text-olive-700">
             {{ t("exchange.description") }}
