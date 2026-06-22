@@ -2,6 +2,7 @@ export default {
     nav: {
         indices: "Indices",
         exchange: "Exchange",
+        menu: "Open navigation menu",
     },
     home: {
         tagline:
