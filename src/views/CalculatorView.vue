@@ -7,6 +7,7 @@ import { bacenRequest } from "@/utils/bacen"
 import { ipeaRequest } from "@/utils/ipea"
 import { cachedIndexRequest } from "@/utils/cache"
 import { computeCumulativeInterest } from "@/utils/finance"
+import { computeFixedIncomeTax } from "@/utils/tax"
 import { ECONOMIC_INDICES, IndexId } from "@/config/indices"
 import DateInput from "@/components/DateInput.vue"
 import IndexLineChart from "@/components/IndexLineChart.vue"
@@ -146,12 +147,28 @@ const totalReturn = computed(() =>
 )
 const months = computed(() => adjustedValues.value.length)
 const finalValue = computed(() => amount.value * (1 + totalReturn.value))
+const taxBreakdown = computed(() =>
+    computeFixedIncomeTax(
+        amount.value,
+        finalValue.value,
+        periodStart.value,
+        periodEnd.value
+    )
+)
+const netFinalValue = computed(() => taxBreakdown.value.netValue)
+const netReturn = computed(() =>
+    amount.value > 0 ? taxBreakdown.value.netIncome / amount.value : 0
+)
 // Geometric annualization: what constant annual rate would produce the same
 // total return over the same number of months?
 //   annualized = (1 + total)^(12 / n) − 1
 const annualized = computed(() => {
     if (months.value === 0) return 0
     return Math.pow(1 + totalReturn.value, 12 / months.value) - 1
+})
+const netAnnualized = computed(() => {
+    if (months.value === 0) return 0
+    return Math.pow(1 + netReturn.value, 12 / months.value) - 1
 })
 
 const hasResult = computed(() => adjustedValues.value.length > 0)
@@ -275,20 +292,20 @@ const formatCurrency = (value: number) =>
                     <PhSpinnerGap class="h-8 w-8 animate-spin" />
                 </div>
 
-                <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     <div class="rounded-lg bg-white p-4 shadow-sm">
                         <div class="text-sm font-medium text-olive-600">
-                            {{ t("calculator.results.finalValue") }}
+                            {{ t("calculator.results.netFinalValue") }}
                         </div>
                         <div
                             class="slashed-zero font-mono text-2xl font-semibold"
                         >
-                            {{ formatCurrency(finalValue) }}
+                            {{ formatCurrency(netFinalValue) }}
                         </div>
                         <div class="text-xs text-olive-400">
                             {{
-                                t("calculator.results.invested", {
-                                    amount: formatCurrency(amount),
+                                t("calculator.results.grossFinalValue", {
+                                    amount: formatCurrency(finalValue),
                                 })
                             }}
                         </div>
@@ -296,29 +313,80 @@ const formatCurrency = (value: number) =>
 
                     <div class="rounded-lg bg-white p-4 shadow-sm">
                         <div class="text-sm font-medium text-olive-600">
-                            {{ t("calculator.results.totalReturn") }}
+                            {{ t("calculator.results.netReturn") }}
                         </div>
                         <div
                             class="slashed-zero font-mono text-2xl font-semibold"
                         >
-                            {{ (100 * totalReturn).toFixed(2) }}%
+                            {{ (100 * netReturn).toFixed(2) }}%
                         </div>
                         <div class="text-xs text-olive-400">
-                            {{ t("calculator.results.months", { n: months }) }}
+                            {{
+                                t("calculator.results.grossReturn", {
+                                    value: (100 * totalReturn).toFixed(2),
+                                })
+                            }}
                         </div>
                     </div>
 
                     <div class="rounded-lg bg-white p-4 shadow-sm">
                         <div class="text-sm font-medium text-olive-600">
-                            {{ t("calculator.results.annualized") }}
+                            {{ t("calculator.results.netAnnualized") }}
                         </div>
                         <div
                             class="slashed-zero font-mono text-2xl font-semibold"
                         >
-                            {{ (100 * annualized).toFixed(2) }}%
+                            {{ (100 * netAnnualized).toFixed(2) }}%
                         </div>
                         <div class="text-xs text-olive-400">
-                            {{ t("calculator.results.perAnnum") }}
+                            {{
+                                t("calculator.results.grossAnnualized", {
+                                    value: (100 * annualized).toFixed(2),
+                                })
+                            }}
+                        </div>
+                    </div>
+
+                    <div class="rounded-lg bg-white p-4 shadow-sm">
+                        <div class="text-sm font-medium text-olive-600">
+                            {{ t("calculator.results.taxes") }}
+                        </div>
+                        <div class="mt-1 space-y-1 text-sm text-olive-700">
+                            <div class="flex justify-between gap-3">
+                                <span>
+                                    {{
+                                        t("calculator.results.iof", {
+                                            rate: (
+                                                100 * taxBreakdown.iofRate
+                                            ).toFixed(0),
+                                        })
+                                    }}
+                                </span>
+                                <span class="slashed-zero font-mono">
+                                    {{ formatCurrency(taxBreakdown.iof) }}
+                                </span>
+                            </div>
+                            <div class="flex justify-between gap-3">
+                                <span>
+                                    {{
+                                        t("calculator.results.ir", {
+                                            rate: (
+                                                100 * taxBreakdown.irRate
+                                            ).toFixed(1),
+                                        })
+                                    }}
+                                </span>
+                                <span class="slashed-zero font-mono">
+                                    {{ formatCurrency(taxBreakdown.ir) }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-1 text-xs text-olive-400">
+                            {{
+                                t("calculator.results.holdingPeriod", {
+                                    n: taxBreakdown.days,
+                                })
+                            }}
                         </div>
                     </div>
                 </div>
