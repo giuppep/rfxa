@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watchEffect, watch } from "vue"
 import { useI18n } from "vue-i18n"
-import { PhSpinnerGap } from "@phosphor-icons/vue"
+import { PhInfo, PhSpinnerGap } from "@phosphor-icons/vue"
 import { IndexValue } from "@/models/finance"
 import { bacenRequest } from "@/utils/bacen"
 import { ipeaRequest } from "@/utils/ipea"
@@ -12,16 +12,35 @@ import { ECONOMIC_INDICES, IndexId } from "@/config/indices"
 import DateInput from "@/components/DateInput.vue"
 import IndexLineChart from "@/components/IndexLineChart.vue"
 import IndexSelector from "@/components/IndexSelector.vue"
+import ToggleSwitch from "@/components/ToggleSwitch.vue"
 
 const { t, locale } = useI18n()
 
+type CalculationMode = "historical" | "projection"
 type ModifierType = "percentage" | "spread" | "fixed"
 type IndexSelection = IndexId | "fixed"
+type ProjectionUnit = "months" | "years"
 
 const amount = ref(10000)
 const indexSelection = ref<IndexSelection>("cdi")
 const modifierType = ref<ModifierType>("percentage")
 const modifierValue = ref(100)
+const calculationMode = ref<CalculationMode>("historical")
+const projectionLength = ref(12)
+const projectionUnit = ref<ProjectionUnit>("months")
+
+const calculationModeOptions = computed(() => [
+    { value: "historical" as const, label: t("calculator.modes.historical") },
+    { value: "projection" as const, label: t("calculator.modes.projection") },
+])
+
+const projectionUnitOptions = computed(() => [
+    {
+        value: "months" as const,
+        label: t("calculator.projection.units.months"),
+    },
+    { value: "years" as const, label: t("calculator.projection.units.years") },
+])
 
 const periodEnd = ref(new Date())
 const periodStart = ref(new Date())
@@ -63,15 +82,28 @@ watchEffect(async () => {
     const index = ECONOMIC_INDICES.find((i) => i.id === indexSelection.value)
     if (!index) return
     const request = index.provider === "ipea" ? ipeaRequest : bacenRequest
+    const fetchPeriodEnd = new Date()
+    const fetchPeriodStart = new Date(fetchPeriodEnd)
+
+    if (calculationMode.value === "historical") {
+        fetchPeriodStart.setTime(periodStart.value.getTime())
+        fetchPeriodEnd.setTime(periodEnd.value.getTime())
+    } else {
+        fetchPeriodStart.setMonth(fetchPeriodStart.getMonth() - 24)
+    }
+
     loading.value = true
     rawIndexValues.value = await cachedIndexRequest(
         request,
         index,
-        periodStart.value,
-        periodEnd.value
+        fetchPeriodStart,
+        fetchPeriodEnd
     )
     loading.value = false
 })
+
+const annualToMonthlyRate = (annualRate: number) =>
+    Math.pow(1 + annualRate, 1 / 12) - 1
 
 // For fixed-rate mode there is no index to fetch, so we generate a synthetic
 // monthly series where every entry carries the same rate. The annual rate the
@@ -93,6 +125,70 @@ function syntheticMonthSeries(
     return result
 }
 
+function addMonths(date: Date, months: number) {
+    const next = new Date(date)
+    next.setMonth(next.getMonth() + months)
+    return next
+}
+
+function syntheticForwardMonthSeries(
+    start: Date,
+    months: number,
+    monthlyRate: number
+): IndexValue[] {
+    return Array.from({ length: months }, (_, idx) => ({
+        date: addMonths(start, months - idx),
+        value: monthlyRate,
+    }))
+}
+
+const projectionMonths = computed(() => {
+    const rawLength = Number.isFinite(projectionLength.value)
+        ? projectionLength.value
+        : 1
+    const length = Math.max(1, Math.floor(rawLength))
+    return projectionUnit.value === "years" ? length * 12 : length
+})
+
+const projectionStart = computed(() => new Date())
+const projectionEnd = computed(() =>
+    addMonths(projectionStart.value, projectionMonths.value)
+)
+
+const displayPeriodStart = computed(() =>
+    calculationMode.value === "historical"
+        ? periodStart.value
+        : projectionStart.value
+)
+
+const displayPeriodEnd = computed(() =>
+    calculationMode.value === "historical"
+        ? periodEnd.value
+        : projectionEnd.value
+)
+
+const applyModifier = (monthlyRate: number) => {
+    if (modifierType.value === "percentage") {
+        return monthlyRate * (modifierValue.value / 100)
+    }
+
+    const monthlySpread = annualToMonthlyRate(modifierValue.value / 100)
+    return (1 + monthlyRate) * (1 + monthlySpread) - 1
+}
+
+const currentMonthlyRate = computed(() => {
+    if (!isIndexBased.value)
+        return annualToMonthlyRate(modifierValue.value / 100)
+
+    const latestValue = rawIndexValues.value[0]
+    if (!latestValue) return 0
+    return applyModifier(latestValue.value)
+})
+
+const currentAnnualizedRate = computed(
+    () => Math.pow(1 + currentMonthlyRate.value, 12) - 1
+)
+
 // The effective monthly rates after applying the selected modifier, sorted
 // descending (newest first) to match the rest of the app's convention.
 //
@@ -106,25 +202,25 @@ function syntheticMonthSeries(
 //   "fixed"       — no index; uses syntheticMonthSeries with the monthly
 //                   equivalent of the stated annual rate
 const adjustedValues = computed((): IndexValue[] => {
+    if (calculationMode.value === "projection") {
+        return syntheticForwardMonthSeries(
+            projectionStart.value,
+            projectionMonths.value,
+            currentMonthlyRate.value
+        )
+    }
+
     if (!isIndexBased.value) {
         return syntheticMonthSeries(
             periodStart.value,
             periodEnd.value,
-            Math.pow(1 + modifierValue.value / 100, 1 / 12) - 1
+            annualToMonthlyRate(modifierValue.value / 100)
         )
     }
     const values = rawIndexValues.value.filter(
         (iv) => iv.date >= periodStart.value && iv.date <= periodEnd.value
     )
-    if (modifierType.value === "percentage") {
-        const pct = modifierValue.value / 100
-        return values.map((iv) => ({ ...iv, value: iv.value * pct }))
-    }
-    const monthlySpread = Math.pow(1 + modifierValue.value / 100, 1 / 12) - 1
-    return values.map((iv) => ({
-        ...iv,
-        value: (1 + iv.value) * (1 + monthlySpread) - 1,
-    }))
+    return values.map((iv) => ({ ...iv, value: applyModifier(iv.value) }))
 })
 
 // Running product of (1 + monthly_rate) starting from the oldest month,
@@ -151,8 +247,8 @@ const taxBreakdown = computed(() =>
     computeFixedIncomeTax(
         amount.value,
         finalValue.value,
-        periodStart.value,
-        periodEnd.value
+        displayPeriodStart.value,
+        displayPeriodEnd.value
     )
 )
 const netFinalValue = computed(() => taxBreakdown.value.netValue)
@@ -187,7 +283,7 @@ const formatCurrency = (value: number) =>
 
         <!-- Inputs -->
         <div
-            class="mb-6 grid grid-cols-1 gap-6 rounded-lg bg-white p-4 shadow-sm md:grid-cols-3"
+            class="mb-6 grid grid-cols-1 gap-6 rounded-lg bg-white p-4 shadow-sm md:grid-cols-2 xl:grid-cols-4"
         >
             <!-- Amount -->
             <label class="flex flex-col gap-1">
@@ -257,11 +353,28 @@ const formatCurrency = (value: number) =>
             </div>
 
             <!-- Period -->
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2 items-start">
+                <!-- Mode -->
+                <div class="flex flex-col gap-2">
+                    <span class="text-sm font-medium text-olive-700">
+                        {{ t("calculator.mode") }}
+                    </span>
+                    <ToggleSwitch
+                        v-model="calculationMode"
+                        :options="calculationModeOptions"
+                    />
+                </div>
                 <span class="text-sm font-medium text-olive-700">
-                    {{ t("calculator.period") }}
+                    {{
+                        calculationMode === "historical"
+                            ? t("calculator.period")
+                            : t("calculator.projection.period")
+                    }}
                 </span>
-                <div class="flex flex-wrap gap-2">
+                <div
+                    v-if="calculationMode === 'historical'"
+                    class="flex flex-wrap gap-2"
+                >
                     <DateInput
                         v-model="periodStart"
                         :label="t('calculator.from')"
@@ -270,6 +383,43 @@ const formatCurrency = (value: number) =>
                         v-model="periodEnd"
                         :label="t('calculator.to')"
                     />
+                </div>
+                <div v-else class="flex flex-wrap items-center gap-2">
+                    <input
+                        v-model.number="projectionLength"
+                        type="number"
+                        min="1"
+                        step="1"
+                        class="w-20 rounded-md border px-2 py-0.5"
+                    />
+                    <ToggleSwitch
+                        v-model="projectionUnit"
+                        :options="projectionUnitOptions"
+                        size="sm"
+                    />
+                    <span class="text-xs text-olive-500">
+                        {{
+                            t("calculator.projection.currentAnnualized", {
+                                value: (100 * currentAnnualizedRate).toFixed(2),
+                            })
+                        }}
+                    </span>
+                    <button
+                        v-tooltip="
+                            t('calculator.projection.currentAnnualizedTooltip')
+                        "
+                        type="button"
+                        class="inline-flex h-5 w-5 items-center justify-center rounded-full text-olive-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-olive-400 focus-visible:ring-offset-2"
+                    >
+                        <PhInfo class="h-4 w-4 shrink-0" />
+                        <span class="sr-only">
+                            {{
+                                t(
+                                    "calculator.projection.currentAnnualizedTooltip"
+                                )
+                            }}
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -292,7 +442,9 @@ const formatCurrency = (value: number) =>
                     <PhSpinnerGap class="h-8 w-8 animate-spin" />
                 </div>
 
-                <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div
+                    class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+                >
                     <div class="rounded-lg bg-white p-4 shadow-sm">
                         <div class="text-sm font-medium text-olive-600">
                             {{ t("calculator.results.netFinalValue") }}
@@ -393,8 +545,8 @@ const formatCurrency = (value: number) =>
 
                 <IndexLineChart
                     :index-values="growthSeries"
-                    :period-start="periodStart"
-                    :period-end="periodEnd"
+                    :period-start="displayPeriodStart"
+                    :period-end="displayPeriodEnd"
                     series="total"
                 />
             </template>

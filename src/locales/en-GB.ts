@@ -113,11 +113,26 @@ export default {
     calculator: {
         pageTitle: "Returns calculator",
         investedAmount: "Invested amount",
+        mode: "Mode",
         index: "Index",
         fixedRate: "Fixed rate",
         period: "Period",
         from: "From",
         to: "To",
+        modes: {
+            historical: "Historical",
+            projection: "Future",
+        },
+        projection: {
+            period: "Projection",
+            currentAnnualized: "Current annualized: {value}%",
+            currentAnnualizedTooltip:
+                "Uses the latest available monthly rate for the selected index, applies the selected modifier, then annualizes it as (1 + monthly rate)^12 - 1. The projection compounds that monthly rate forward.",
+            units: {
+                months: "Months",
+                years: "Years",
+            },
+        },
         modifierType: {
             percentage: "% of index",
             spread: "Index + % p.a.",

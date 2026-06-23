@@ -112,11 +112,26 @@ export default {
     calculator: {
         pageTitle: "Calculadora de retornos",
         investedAmount: "Valor investido",
+        mode: "Modo",
         index: "Índice",
         fixedRate: "Taxa fixa",
         period: "Período",
         from: "De",
         to: "Até",
+        modes: {
+            historical: "Histórico",
+            projection: "Futuro",
+        },
+        projection: {
+            period: "Projeção",
+            currentAnnualized: "Atual anualizado: {value}%",
+            currentAnnualizedTooltip:
+                "Usa a última taxa mensal disponível do índice selecionado, aplica o modificador escolhido e anualiza como (1 + taxa mensal)^12 - 1. A projeção capitaliza essa taxa mensal no futuro.",
+            units: {
+                months: "Meses",
+                years: "Anos",
+            },
+        },
         modifierType: {
             percentage: "% do índice",
             spread: "Índice + % a.a.",
