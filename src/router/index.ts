@@ -16,7 +16,7 @@ const router = createRouter({
             redirect: "/indices/cdi",
             children: [
                 {
-                    path: `/indices/:type(${ECONOMIC_INDICES.map((index) => index.id).join("|")})`,
+                    path: `/indices/:indexId(${ECONOMIC_INDICES.map((index) => index.id).join("|")})`,
                     name: "indices",
                     component: IndicesView,
                     props: true,
