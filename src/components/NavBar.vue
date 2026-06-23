@@ -10,6 +10,7 @@ const menuOpen = ref(false)
 const navLinks = [
     { to: { name: "indices-root" }, labelKey: "nav.indices" },
     { to: { name: "exchange-usd-brl" }, labelKey: "nav.exchange" },
+    { to: { name: "calculator" }, labelKey: "nav.calculator" },
 ]
 
 const availableLocales = i18n.global.availableLocales
@@ -39,15 +40,6 @@ const setLocale = (code: string) => {
                     active-class="bg-olive-500 text-olive-50!"
                 >
                     {{ t(link.labelKey) }}
-                </RouterLink>
-            </li>
-            <li>
-                <RouterLink
-                    :to="{ name: 'calculator' }"
-                    class="text-olive-700 hover:text-olive-100 hover:bg-olive-400 px-2 py-0.5 rounded-md"
-                    active-class="bg-olive-500 text-olive-50!"
-                >
-                    {{ t("nav.calculator") }}
                 </RouterLink>
             </li>
         </ul>
