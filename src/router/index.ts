@@ -4,7 +4,7 @@ import IndicesView from "@/views/IndicesView.vue"
 import NotFoundView from "@/views/NotFoundView.vue"
 import { ECONOMIC_INDICES } from "@/config/indices"
 import ExchangeRateView from "@/views/ExchangeRateView.vue"
-import { setRouteSeo } from "@/utils/seo"
+import { DEFAULT_DESCRIPTION, setRouteSeo } from "@/utils/seo"
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +20,23 @@ const router = createRouter({
                     name: "indices",
                     component: IndicesView,
                     props: true,
+                    // meta.seo is consumed by setRouteSeo (router.afterEach
+                    // below) to set the page title/description; see the
+                    // RouteMeta augmentation in @/utils/seo.
+                    meta: {
+                        seo: (to) => {
+                            const index = ECONOMIC_INDICES.find(
+                                (index) => index.id === to.params.type
+                            )
+
+                            return (
+                                index && {
+                                    title: index.seoTitle,
+                                    description: index.seoDescription,
+                                }
+                            )
+                        },
+                    },
                 },
             ],
         },
@@ -27,11 +44,25 @@ const router = createRouter({
             path: "/exchange/usd-brl",
             name: "exchange-usd-brl",
             component: ExchangeRateView,
+            meta: {
+                seo: () => ({
+                    title: "Cotação USD/BRL PTAX - rfxa",
+                    description:
+                        "Consulte a cotação oficial USD/BRL PTAX de compra e venda publicada pelo Banco Central do Brasil.",
+                }),
+            },
         },
         {
             path: "/:pathMatch(.*)*",
             name: "not-found",
             component: NotFoundView,
+            meta: {
+                seo: () => ({
+                    title: "Página não encontrada - rfxa",
+                    description: DEFAULT_DESCRIPTION,
+                    noindex: true,
+                }),
+            },
         },
     ],
 })
