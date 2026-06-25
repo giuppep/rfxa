@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rfxa.giuppep.dev/sitemap.xml
