@@ -4,6 +4,7 @@ import IndicesView from "@/views/IndicesView.vue"
 import NotFoundView from "@/views/NotFoundView.vue"
 import { ECONOMIC_INDICES } from "@/config/indices"
 import ExchangeRateView from "@/views/ExchangeRateView.vue"
+import { setRouteSeo } from "@/utils/seo"
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,5 +35,7 @@ const router = createRouter({
         },
     ],
 })
+
+router.afterEach(setRouteSeo)
 
 export default router
